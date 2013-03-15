@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:body>
+    	<ui:composition template="template.xhtml">
+    		<ui:define name="content">
+				<h2>Your Account</h2>
+				
+				<!-- User logged in -->
+				<h:panelGroup rendered="#{sessionData.user != null}">
+				
+					<!-- Project Detail Table -->
+					<table cellpadding="0" cellspacing="0"  class="projectTable">
+						<tr>
+							<th>User Name</th>
+							<td><h:outputText value="#{sessionData.user.username}" /></td>
+						</tr>
+						<tr>
+							<th>Name</th>
+							<td><h:outputText value="#{sessionData.user.name}" /></td>
+						</tr>
+					</table>				
+				
+					<!-- 
+						//TODO: Display funded projects
+						//TODO: Add possibility to create new projects (requires a form)
+					 --> 
+				</h:panelGroup>
+				
+				<!-- User not logged in. Display the login form. -->
+				<h:panelGroup rendered="#{sessionData.user == null}">
+					<h:form>
+					<table>
+						<tr>
+							<th>Username</th>
+							<td><h:inputText value="#{userController.username}" /></td>
+						</tr>
+						<tr>
+							<th>Password</th>
+							<td><h:inputSecret value="#{userController.password}" /></td>
+						</tr>
+						<tr>
+							<th colspan="2">
+								<h:commandButton value="Search" action="#{userController.login}" />
+							</th>
+						</tr>
+					</table>
+					</h:form>
+				</h:panelGroup>
+    		</ui:define>
+    	</ui:composition>
+    </h:body>
+</html>

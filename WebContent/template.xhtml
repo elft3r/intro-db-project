@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+ 
+    <h:head>
+		<link href="style.css" rel="stylesheet" type="text/css" />
+    </h:head>
+ 
+    <h:body>
+    
+		<table id="masterTable" cellpadding="0" cellspacing="0">
+			<tr>
+				<th id="masterHeader" colspan="2">
+					<h1>CrowdStarter</h1>
+					Project by Sandro Felicioni und Jochen Zehnder 
+				</th>
+			</tr>
+			<tr id="masterContent">
+			
+				<td id="masterContentMenu">
+					
+					<div class="menuDiv1"></div>
+					<div class="menuDiv1"><a href="Home.jsf">Home</a></div>
+					<div class="menuDiv1"><a href="Projects.jsf">All projects</a></div>
+					<div class="menuDiv2"><a href="Projects.jsf?filter=popular">Most popular</a></div>
+					<div class="menuDiv2"><a href="Projects.jsf?filter=funded">Most funded</a></div>
+					<div class="menuDiv2"><a href="Projects.jsf?filter=ending">Ending soon</a></div>
+					<div class="menuDiv1">Categories</div>
+					<div class="menuDiv2"><a href="Projects.jsf?category=art">Art</a></div>
+					<div class="menuDiv2"><a href="Projects.jsf?category=comics">Comics</a></div>
+					<div class="menuDiv2"><a href="Projects.jsf?category=music">Music</a></div>
+					<div class="menuDiv2"><a href="Projects.jsf?category=other">...</a></div>
+					<div class="menuDiv1"><a href="Search.jsf">Search</a></div>
+					<div class="menuDiv1"><a href="User.jsf">User Profile</a></div>
+					
+				</td>
+				
+				<td id="masterContentPlaceholder">
+				  	<ui:insert name="content">
+				  		<!-- Our content will be inserted here -->
+				   	</ui:insert>
+				</td>
+			</tr>
+			<tr>
+				<td id="masterFooter" colspan="2">Data Modeling and Databases Project 2013</td>
+			</tr>
+		</table>
+    </h:body>
+</html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:body>
+    	<ui:composition template="template.xhtml">
+ 
+    		<ui:define name="content">
+				<h1>Project Detail</h1>
+				
+				<!-- Project Detail Table -->
+				<table cellpadding="0" cellspacing="0"  class="projectTable">
+					<tr>
+						<th>Project Name</th>
+						<td><h:outputText value="#{projectController.selectedProject.name}" /></td>
+					</tr>
+					<tr>
+						<th>Test Field2</th>
+						<td><h:outputText value="#{projectController.selectedProject.field2}" /></td>
+					</tr>
+					<tr>
+						<th>Test Integer Field 3</th>
+						<td><h:outputText value="#{projectController.selectedProject.field3}" /></td>
+					</tr>
+				</table>				
+
+				<br/>
+				
+				<!-- TODO Display different funding amounts -->
+				<h:dataTable value="#{projectController.paymentAmounts}" var="amount" styleClass="projectsTable"
+							 cellpadding="0" cellspacing="0" rendered="#{not empty projectController.paymentAmounts}">
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Name" />
+				        </f:facet>
+				        <h:outputText value="#{amount.name}" />
+				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Reward" />
+				        </f:facet>
+				        <h:outputText value="#{amount.reward}" />
+				    </h:column>
+				</h:dataTable>
+				
+				<br/>
+				 
+				 
+				<!-- Allow the user to add a comment -->
+				<h:form rendered="#{applicationModel.user.name != null}">
+					Add Comment
+					<br />
+					<h:inputTextarea cols="50" rows="4" value="#{projectController.comment}"/>
+					<br />
+					<h:commandButton value="Submit" action="#{projectController.addComment}" />
+					<br/>
+				</h:form>
+				
+				<!-- TODO Display comments -->
+				<h:dataTable value="#{projectController.comments}" var="comment" styleClass="projectsTable"
+							 cellpadding="0" cellspacing="0" rendered="#{not empty projectController.comments}">
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Username" />
+				        </f:facet>
+				        <h:outputText value="#{comment.username}" />
+				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Comment" />
+				        </f:facet>
+				        <h:outputText value="#{comment.comment}" />
+				    </h:column>
+				</h:dataTable>
+
+    		</ui:define>
+    	</ui:composition>
+    </h:body>
+</html>

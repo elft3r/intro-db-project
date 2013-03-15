@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:body>
+    	<ui:composition template="template.xhtml">
+ 
+    		<ui:define name="content">
+				<h1>Search</h1>
+				
+				<hr/>
+				
+				<h:form>
+				<div>
+					Search By Name:
+					<h:inputText value="#{searchController.name}" />
+					<h:commandButton value="Search" action="#{searchController.search}" />
+				</div>
+				</h:form>
+				
+				<hr/>
+
+				<h:form>
+				<div>
+					<h:inputHidden value="category"/>
+					Search By Category:
+					<h:inputText value="#{searchController.category}" />
+					<h:commandButton value="Search" action="#{searchController.search}" />
+				</div>
+				</h:form>
+				
+				<hr/>
+				
+				<h:form>
+				<div>
+					<h:inputHidden value="city" />
+					Search By City:
+					<h:inputText value="#{searchController.city}" />
+					<h:commandButton value="Search" action="#{searchController.search}" />
+				</div>
+				</h:form>
+				
+				<hr/>
+
+				<!-- 
+					//TODO Display search results 
+				 -->
+				<h:dataTable value="#{searchController.projects}" var="project" cellpadding="0" cellspacing="0" 
+							 styleClass="projectsTable" rendered="#{not empty searchController.projects}">
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Project Name" />
+				        </f:facet>
+				        <h:outputText value="#{project.name}" />
+				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Field 2" />
+				        </f:facet>
+				        <h:outputText value="#{project.field2}" />
+				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Field 3" />
+				        </f:facet>
+				        <h:outputText value="#{project.field3}" />
+				    </h:column>
+				    <h:column>
+				    	<f:facet name="header">
+				            <h:outputText value="Detail" />
+				        </f:facet>
+				        <a href="Project.jsf?id=#{project.id}">View Project</a>
+				    </h:column>
+				</h:dataTable>
+				<hr/>
+    		</ui:define>
+ 
+    	</ui:composition>
+    </h:body>
+</html>
