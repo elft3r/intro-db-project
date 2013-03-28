@@ -1,0 +1,15 @@
+apply plugin: 'war'
+
+sourceSets.main.java.srcDirs = ['src']
+webAppDirName = 'WebContent'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.18'
+	compile group: 'com.sun.el', name: 'el-ri', version: '1.0'
+	compile group: 'com.sun.faces', name: 'jsf-api', version: '2.1.7'
+	compile group: 'com.sun.faces', name: 'jsf-impl', version: '2.1.7'
+}
