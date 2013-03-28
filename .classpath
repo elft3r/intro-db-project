@@ -8,14 +8,14 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mysql-connector-java-5.1.18-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/Java SE 7 (MacOS X Default)">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/el-ri-1.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jsf-api-2.1.7.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jsf-impl-2.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/el-ri-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jsf-api-2.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/jsf-impl-2.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.18-bin.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
