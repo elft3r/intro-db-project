@@ -13,3 +13,5 @@ dependencies {
 	compile group: 'com.sun.faces', name: 'jsf-api', version: '2.1.7'
 	compile group: 'com.sun.faces', name: 'jsf-impl', version: '2.1.7'
 }
+
+task stage(dependsOn: 'war')
