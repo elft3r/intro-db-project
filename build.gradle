@@ -1,10 +1,12 @@
 apply plugin: 'war'
 
+// some adjustments needed for our project layout
 sourceSets.main.java.srcDirs = ['src']
 webAppDirName = 'WebContent'
 
 // Heroku needs a main class
 mainClassName = "DummyMain"
+applicationName = "webapp"
 
 repositories {
 	mavenCentral()
@@ -17,4 +19,5 @@ dependencies {
 	compile group: 'com.sun.faces', name: 'jsf-impl', version: '2.1.7'
 }
 
+// Heroku needs the 'stage' task, as this is triggered at the server
 task stage(dependsOn: 'war')
