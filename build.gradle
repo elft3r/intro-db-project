@@ -3,6 +3,9 @@ apply plugin: 'war'
 sourceSets.main.java.srcDirs = ['src']
 webAppDirName = 'WebContent'
 
+// Heroku needs a main class
+mainClassName = "DummyMain"
+
 repositories {
 	mavenCentral()
 }
