@@ -6,7 +6,6 @@ webAppDirName = 'WebContent'
 
 // Heroku needs a main class
 mainClassName = "DummyMain"
-applicationName = "webapp"
 
 repositories {
 	mavenCentral()
