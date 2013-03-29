@@ -1,1 +1,1 @@
-web: ./build/libs/intro-db-project
+web: sh build/libs/intro-db-project
