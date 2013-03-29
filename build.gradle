@@ -1,22 +1,30 @@
-apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'application'
 
 // some adjustments needed for our project layout
 sourceSets.main.java.srcDirs = ['src']
-webAppDirName = 'WebContent'
-
-// Heroku needs a main class
-mainClassName = "DummyMain"
+mainClassName = "ch.ethz.inf.dbproject.start.LaunchServer"
+applicationName = "webapp"
 
 repositories {
 	mavenCentral()
 }
+
+// the tomcat version we use
+def tomcatVersion = '7.0.39'
 
 dependencies {
 	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.18'
 	compile group: 'com.sun.el', name: 'el-ri', version: '1.0'
 	compile group: 'com.sun.faces', name: 'jsf-api', version: '2.1.7'
 	compile group: 'com.sun.faces', name: 'jsf-impl', version: '2.1.7'
+	compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatVersion
+	compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-logging-juli', version: tomcatVersion
+	compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-jasper', version: tomcatVersion
+	compile group: 'org.apache.tomcat', name: 'tomcat-jasper', version: tomcatVersion
+	compile group: 'org.apache.tomcat', name: 'tomcat-jasper-el', version: tomcatVersion
+	compile group: 'org.apache.tomcat', name: 'tomcat-jsp-api', version: tomcatVersion
 }
 
 // Heroku needs the 'stage' task, as this is triggered at the server
-task stage(dependsOn: 'war')
+task stage(dependsOn: 'installApp')

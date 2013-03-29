@@ -1,1 +1,1 @@
-web: sh build/libs/intro-db-project
+web: ./build/install/webapp/bin/webapp
