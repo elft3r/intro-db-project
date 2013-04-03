@@ -2,7 +2,6 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 // some adjustments needed for our project layout
-sourceSets.main.java.srcDirs = ['src']
 mainClassName = "ch.ethz.inf.dbproject.start.LaunchServer"
 applicationName = "webapp"
 
@@ -24,7 +23,8 @@ dependencies {
 	compile group: 'org.apache.tomcat', name: 'tomcat-jasper', version: tomcatVersion
 	compile group: 'org.apache.tomcat', name: 'tomcat-jasper-el', version: tomcatVersion
 	compile group: 'org.apache.tomcat', name: 'tomcat-jsp-api', version: tomcatVersion
+	compile group: 'junit', name: 'junit', version: '4.11'
 }
 
 // Heroku needs the 'stage' task, as this is triggered at the server
-task stage(dependsOn: 'installApp')
+task stage(dependsOn: [test, installApp])

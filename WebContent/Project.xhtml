@@ -15,15 +15,11 @@
 				<table cellpadding="0" cellspacing="0"  class="projectTable">
 					<tr>
 						<th>Project Name</th>
-						<td><h:outputText value="#{projectController.selectedProject.name}" /></td>
+						<td><h:outputText value="#{projectController.selectedProject.title}" /></td>
 					</tr>
 					<tr>
-						<th>Test Field2</th>
-						<td><h:outputText value="#{projectController.selectedProject.field2}" /></td>
-					</tr>
-					<tr>
-						<th>Test Integer Field 3</th>
-						<td><h:outputText value="#{projectController.selectedProject.field3}" /></td>
+						<th>Project Description</th>
+						<td><h:outputText value="#{projectController.selectedProject.description}" /></td>
 					</tr>
 				</table>				
 
@@ -36,7 +32,7 @@
 				        <f:facet name="header">
 				            <h:outputText value="Name" />
 				        </f:facet>
-				        <h:outputText value="#{amount.name}" />
+				        <h:outputText value="#{amount.amount}" />
 				    </h:column>
 				    <h:column>
 				        <f:facet name="header">
