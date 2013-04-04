@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
+sourceCompatibility = 1.7
+
 // some adjustments needed for our project layout
 mainClassName = "ch.ethz.inf.dbproject.start.LaunchServer"
 applicationName = "webapp"
