@@ -1,0 +1,11 @@
+Sandro:
+* Register and Login
+* search projects
+* fund project
+* User view
+
+Jochen:
+* Create Project
+* Project detailed view
+* View popular, .... projects
+* Category views
