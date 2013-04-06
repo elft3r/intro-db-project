@@ -5,25 +5,31 @@ package ch.ethz.inf.dbproject.model;
  */
 public final class User {
 
-	private final int userid;
-	private final String username;
-	private final String name;
+	private int id;
+	private String username;
+	private String password;
 	
-	public User(final int userid, final String username, final String name) {
-		this.userid = userid;
-		this.username = username;
-		this.name = name;
+	public int getId() {
+		return id;
 	}
-
-	public int getUserid() {
-		return userid;
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	public String getUsername() {
 		return username;
 	}
+	
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-	public String getName() {
-		return name;
-	}	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 }

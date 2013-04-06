@@ -32,6 +32,12 @@ public final class DatastoreInterface {
 	 */
 	private static final String SELECT_PROJECY_BY_ID_PREP = "SELECT * FROM project WHERE id = ?";
 	private PreparedStatement projectById;
+
+	/**
+	 * {@link PreparedStatement} for retrieving a single user
+	 */
+	private static final String SELECT_USER_BY_NAME_PREP = "SELECT * FROM user WHERE username = ?";
+	private PreparedStatement userByName;	
 	
 	private Connection sqlConnection = null;
 
@@ -47,6 +53,7 @@ public final class DatastoreInterface {
 		try {
 			this.faByProject = sqlConnection.prepareStatement(SELECT_FUNDING_AMOUNT_PREP);
 			this.projectById = sqlConnection.prepareStatement(SELECT_PROJECY_BY_ID_PREP);
+			this.userByName = sqlConnection.prepareStatement(SELECT_USER_BY_NAME_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -102,5 +109,22 @@ public final class DatastoreInterface {
 		}
 
 		return res;
+	}
+
+	public User getUserBy(String name) {
+		User user = null;
+		try{
+			userByName.setString(1, name);
+			ResultSet resultSet = userByName.executeQuery();
+			if(resultSet.first()){
+				user = new User();
+				user.setId(resultSet.getInt("id"));
+				user.setUsername(resultSet.getString("username"));
+				user.setPassword(resultSet.getString("password"));
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve user by name", e);
+		}
+		return user;
 	}
 }

@@ -1,10 +1,13 @@
 package ch.ethz.inf.dbproject.logic;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
+import ch.ethz.inf.dbproject.model.User;
 
 @ManagedBean
 @RequestScoped
@@ -14,17 +17,16 @@ public class UserController {
 	
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;
-	
 	private String username;
-	
 	private String password;
 	
 	public String login(){
-		
-		// TODO
-		// Ask the data store interface if it knows this user
-		// Retrieve User
-		// Store this user into the session
+		User user = dbInterface.getUserBy(username);
+		if(user != null){ // success
+			sessionData.setUser(user);
+		}else{
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("User or Password is invalid"));
+		}
 		
 		return "User.jsf";
 	}
