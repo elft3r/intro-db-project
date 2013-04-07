@@ -65,6 +65,9 @@ public final class DatastoreInterface {
 	private static final String INSERT_USER_PREP = "INSERT INTO user (username, password) VALUES (?, ?)";
 	private PreparedStatement insertUser;
 
+	private static final String INSERT_FUND_PREP = "INSERT INTO funds (user_id, fa_id) values(?, ?)";
+	private PreparedStatement insertFund;
+
 	private Connection sqlConnection = null;
 
 	public DatastoreInterface() {
@@ -85,6 +88,7 @@ public final class DatastoreInterface {
 			this.projectsByCategory = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CATEGORY_PREP);
 			this.projectsByCity = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CITY_PREP);
 			this.fundsByUser = sqlConnection.prepareStatement(SELECT_FUNDS_BY_USER);
+			this.insertFund = sqlConnection.prepareStatement(INSERT_FUND_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -155,8 +159,8 @@ public final class DatastoreInterface {
 		return projects;
 	}
 
-	public List<Amount> getAmountsOfProject(int projectId) {
-		List<Amount> res = new ArrayList<>();
+	public List<FundingAmount> getAmountsOfProject(int projectId) {
+		List<FundingAmount> res = new ArrayList<>();
 
 		// set the projectId into the prepared statement
 		try {
@@ -164,13 +168,20 @@ public final class DatastoreInterface {
 
 			try (ResultSet rs = faByProject.executeQuery();) {
 				while (rs.next()) {
-					res.add(new Amount(rs));
+					FundingAmount fundingAmount = new FundingAmount();
+					fundingAmount.setId(rs.getInt("id"));
+					fundingAmount.setAmount(rs.getBigDecimal("amount"));
+					fundingAmount.setReward(rs.getString("reward"));
+
+					Project project = new Project();
+					project.setId(rs.getInt("project_id"));
+					fundingAmount.setProject(project);
+					res.add(fundingAmount);
 				}
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, e.getMessage(), e);
 		}
-
 		return res;
 	}
 
@@ -222,5 +233,16 @@ public final class DatastoreInterface {
 			logger.log(Level.WARNING, "Failed to retrieve user funds", e);
 		}
 		return fundingAmounts;
+	}
+
+	public void fundProject(int userId, int fundingAmountId) {
+		try {
+			insertFund.setInt(1, userId);
+			insertFund.setInt(2, fundingAmountId);
+			insertFund.executeUpdate();
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to insert fund with userId = " + userId + " and fundingAmountId = "
+					+ fundingAmountId, e);
+		}
 	}
 }

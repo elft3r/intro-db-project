@@ -25,12 +25,13 @@
 
 				<br/>
 				
-				<!-- TODO Display different funding amounts -->
-				<h:dataTable value="#{projectController.paymentAmounts}" var="amount" styleClass="projectsTable"
-							 cellpadding="0" cellspacing="0" rendered="#{not empty projectController.paymentAmounts}">
+				<!-- Display different funding amounts -->
+				<h2>Funding Amounts</h2>
+				<h:dataTable value="#{projectController.fundingAmounts}" var="amount" styleClass="projectsTable"
+							 cellpadding="0" cellspacing="0" rendered="#{not empty projectController.fundingAmounts}">
 				    <h:column>
 				        <f:facet name="header">
-				            <h:outputText value="Name" />
+				            <h:outputText value="Amount" />
 				        </f:facet>
 				        <h:outputText value="#{amount.amount}" />
 				    </h:column>
@@ -40,8 +41,26 @@
 				        </f:facet>
 				        <h:outputText value="#{amount.reward}" />
 				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Action" />
+				        </f:facet>
+				        <!-- Note: 
+							 If UICommand or UIInput components are placed inside an iterating component like 
+							 <h:dataTable>, <ui:repeat>, etc, then you need to ensure that exactly the same value of 
+							 the component is been preserved during the apply request values phase of the form submit 
+							 request. JSF will namely reiterate over it to find the clicked link/button and submitted 
+							 input values. Putting the bean in the view scope and/or making sure that you load the data
+							  model in (post)constructor of the bean (and thus not in the getter method!) should fix it.
+							  See: http://stackoverflow.com/questions/2118656/hcommandlink-hcommandbutton-is-not-being-invoked
+							  	   http://balusc.blogspot.ch/2011/09/communication-in-jsf-20.html
+						-->				        
+				        <h:form>
+				        	<input type="hidden" name="fundingAmountId" value="#{amount.id}" />
+				        	<h:commandButton value="Support" action="#{projectController.support}" disabled="#{sessionData.user == null}"/>
+				        </h:form>
+				    </h:column>
 				</h:dataTable>
-				
 				<br/>
 				 
 				 

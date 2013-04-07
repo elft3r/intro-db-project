@@ -1,18 +1,21 @@
 package ch.ethz.inf.dbproject.model;
 
+import java.io.Serializable;
+
 /**
- * This class represents a City 
+ * This class represents a City
  */
-public final class City {
+public final class City implements Serializable {
 
-	private final String name;
+	private static final long serialVersionUID = 2114872906439481482L;
 
-	public City(final String name) {
-		super();
+	private String name;
+
+	public City(String name) {
 		this.name = name;
 	}
 
 	public final String getName() {
 		return name;
-	}	
+	}
 }

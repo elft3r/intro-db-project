@@ -1,8 +1,8 @@
 Sandro:
-* Register and Login
-* search projects
-* fund project
-* User view
+* Register and Login [check]
+* search projects [check]
+* fund project [check]
+* User view [check]
 
 Jochen:
 * Create Project

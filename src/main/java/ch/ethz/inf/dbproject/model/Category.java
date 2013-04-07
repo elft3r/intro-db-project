@@ -1,22 +1,22 @@
 package ch.ethz.inf.dbproject.model;
 
+import java.io.Serializable;
+
 /**
- * Object that represents a category of project (i.e. Art, Music...) 
+ * Object that represents a category of project (i.e. Art, Music...)
  */
-public final class Category {
+public final class Category implements Serializable {
 
-	/**
-	 * TODO All properties need to be added here 
-	 */	
-	private final String name;
+	private static final long serialVersionUID = -5710036722033128519L;
 
-	public Category(final String name) {
-		super();
+	private String name;
+
+	public Category(String name) {
 		this.name = name;
 	}
 
 	public final String getName() {
 		return name;
 	}
-	
+
 }

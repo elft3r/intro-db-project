@@ -1,10 +1,13 @@
 package ch.ethz.inf.dbproject.model;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public final class Project {
+public final class Project implements Serializable {
+
+	private static final long serialVersionUID = 413320471268725530L;
 
 	private int id;
 	private String title;
