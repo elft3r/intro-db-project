@@ -1,5 +1,7 @@
 package ch.ethz.inf.dbproject.logic;
 
+import java.util.List;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -7,6 +9,7 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.context.FacesContext;
 
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
+import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.User;
 import ch.ethz.inf.utils.StringUtils;
 
@@ -57,6 +60,10 @@ public class UserController {
 		}
 		
 		return "User.jsf";
+	}
+	
+	public List<FundingAmount> getFundingAmounts(){
+		return dbInterface.getFundsByUserId(sessionData.getUser().getId());
 	}
 	
 	/**

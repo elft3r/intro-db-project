@@ -39,6 +39,11 @@ public final class DatastoreInterface {
 			+ "where c.name like ?";
 	private PreparedStatement projectsByCity;
 
+	private static final String SELECT_FUNDS_BY_USER = "select p.title, fa.amount, fa.reward from user u "
+			+ "inner join funds f on u.id = f.user_id inner join funding_amount fa on f.fa_id = fa.id "
+			+ "inner join project p on fa.project_id = p.id where u.id = ?";
+	private PreparedStatement fundsByUser;
+
 	/**
 	 * {@link PreparedStatement} for retrieving the funding amounts for a single project
 	 */
@@ -79,6 +84,7 @@ public final class DatastoreInterface {
 			this.projectsByName = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_NAME_PREP);
 			this.projectsByCategory = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CATEGORY_PREP);
 			this.projectsByCity = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CITY_PREP);
+			this.fundsByUser = sqlConnection.prepareStatement(SELECT_FUNDS_BY_USER);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -195,5 +201,26 @@ public final class DatastoreInterface {
 			logger.log(Level.WARNING, "Failed to insert new user", e);
 		}
 		return null;
+	}
+
+	public List<FundingAmount> getFundsByUserId(int id) {
+		List<FundingAmount> fundingAmounts = new ArrayList<>();
+		try {
+			fundsByUser.setInt(1, id);
+			ResultSet resultSet = fundsByUser.executeQuery();
+			while (resultSet.next()) {
+				FundingAmount fundingAmount = new FundingAmount();
+				fundingAmount.setAmount(resultSet.getBigDecimal("amount"));
+				fundingAmount.setReward(resultSet.getString("reward"));
+
+				Project project = new Project();
+				project.setTitle(resultSet.getString("title"));
+				fundingAmount.setProject(project);
+				fundingAmounts.add(fundingAmount);
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve user funds", e);
+		}
+		return fundingAmounts;
 	}
 }

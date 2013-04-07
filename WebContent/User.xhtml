@@ -12,7 +12,7 @@
 				<!-- User logged in -->
 				<h:panelGroup rendered="#{sessionData.user != null}">
 				
-					<!-- Project Detail Table -->
+					<!-- User Detail Table -->
 					<table cellpadding="0" cellspacing="0"  class="projectTable">
 						<tr>
 							<th>UserId</th>
@@ -22,10 +22,35 @@
 							<th>User Name</th>
 							<td><h:outputText value="#{sessionData.user.username}" /></td>
 						</tr>
-					</table>				
-				
+					</table>			
+
+					<!--  Display funded projects -->
+					<h2>Funded Projects</h2>
+					<h:outputText value="You have funded no projects so far!" rendered="#{empty userController.fundingAmounts}" />
+					
+					<h:dataTable value="#{userController.fundingAmounts}" var="fundingAmount" cellpadding="0" cellspacing="0" 
+								 styleClass="projectsTable" rendered="#{not empty userController.fundingAmounts}">
+					    <h:column>
+					        <f:facet name="header">
+					            <h:outputText value="Project Title" />
+					        </f:facet>
+					        <h:outputText value="#{fundingAmount.project.title}" />
+					    </h:column>
+					    <h:column>
+					        <f:facet name="header">
+					            <h:outputText value="Amount" />
+					        </f:facet>
+					        <h:outputText value="#{fundingAmount.amount}" />
+					    </h:column>
+					    <h:column>
+					        <f:facet name="header">
+					            <h:outputText value="Reward" />
+					        </f:facet>
+					        <h:outputText value="#{fundingAmount.reward}" />
+					    </h:column>
+					</h:dataTable>	
+									
 					<!-- 
-						//TODO: Display funded projects
 						//TODO: Add possibility to create new projects (requires a form)
 					 --> 
 				</h:panelGroup>
