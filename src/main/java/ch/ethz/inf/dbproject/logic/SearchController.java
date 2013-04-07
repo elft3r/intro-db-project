@@ -12,29 +12,25 @@ import ch.ethz.inf.dbproject.model.Project;
 @ManagedBean
 @RequestScoped
 public class SearchController {
-	
+
 	private DatastoreInterface dbInterface = new DatastoreInterface();
-	
+
 	private String name;
 	private String category;
 	private String city;
-	
+
 	private List<Project> projects = new ArrayList<Project>();
 
-	public String search(){
+	public String search() {
 
 		if (name != null) {
 			projects = dbInterface.getProjectsByName(name);
 		} else if (category != null) {
-
-			// TODO implement this!
-			// projects.add(this.dbInterface.searchByName(name));
+			projects = dbInterface.getProjectsByCategory(category);
 		} else if (city != null) {
-
-			// TODO implement this!
-			// city.add(this.dbInterface.searchByName(name));
+			projects = dbInterface.getProjectsByCity(city);
 		}
-		
+
 		return "Search.jsf";
 	}
 
@@ -69,5 +65,5 @@ public class SearchController {
 	public void setProjects(List<Project> projects) {
 		this.projects = projects;
 	}
-	
+
 }

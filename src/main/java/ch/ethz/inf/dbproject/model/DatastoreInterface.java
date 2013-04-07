@@ -27,6 +27,18 @@ public final class DatastoreInterface {
 			+ "where p.title like ?";
 	private PreparedStatement projectsByName;
 
+	private static final String SELECT_PROJECTS_BY_CATEGORY_PREP = "select p.id, p.title, p.description, p.goal, "
+			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
+			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
+			+ "where cat.name like ?";
+	private PreparedStatement projectsByCategory;
+
+	private static final String SELECT_PROJECTS_BY_CITY_PREP = "select p.id, p.title, p.description, p.goal, "
+			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
+			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
+			+ "where c.name like ?";
+	private PreparedStatement projectsByCity;
+
 	/**
 	 * {@link PreparedStatement} for retrieving the funding amounts for a single project
 	 */
@@ -65,6 +77,8 @@ public final class DatastoreInterface {
 			this.userByName = sqlConnection.prepareStatement(SELECT_USER_BY_NAME_PREP);
 			this.insertUser = sqlConnection.prepareStatement(INSERT_USER_PREP);
 			this.projectsByName = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_NAME_PREP);
+			this.projectsByCategory = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CATEGORY_PREP);
+			this.projectsByCity = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CITY_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -104,10 +118,22 @@ public final class DatastoreInterface {
 	}
 
 	public List<Project> getProjectsByName(String name) {
+		return retrieveProjects(projectsByName, name);
+	}
+
+	public List<Project> getProjectsByCategory(String name) {
+		return retrieveProjects(projectsByCategory, name);
+	}
+
+	public List<Project> getProjectsByCity(String name) {
+		return retrieveProjects(projectsByCity, name);
+	}
+
+	private List<Project> retrieveProjects(PreparedStatement retrieveProjectsStatement, String name) {
 		List<Project> projects = new ArrayList<>();
 		try {
-			projectsByName.setString(1, "%" + name + "%");
-			ResultSet resultSet = projectsByName.executeQuery();
+			retrieveProjectsStatement.setString(1, "%" + name + "%");
+			ResultSet resultSet = retrieveProjectsStatement.executeQuery();
 			while (resultSet.next()) {
 				Project project = new Project();
 				project.setId(resultSet.getInt("id"));
