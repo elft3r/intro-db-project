@@ -21,6 +21,12 @@ public final class DatastoreInterface {
 
 	private static final String SELECT_ALL_PROJECTS = "SELECT * FROM project";
 
+	private static final String SELECT_PROJECTS_BY_NAME_PREP = "select p.id, p.title, p.description, p.goal, "
+			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
+			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
+			+ "where p.title like ?";
+	private PreparedStatement projectsByName;
+
 	/**
 	 * {@link PreparedStatement} for retrieving the funding amounts for a single project
 	 */
@@ -42,9 +48,6 @@ public final class DatastoreInterface {
 	private static final String INSERT_USER_PREP = "INSERT INTO user (username, password) VALUES (?, ?)";
 	private PreparedStatement insertUser;
 
-	private static final String SELECT_PROJECTS_BY_NAME = "select * from project where title like ?";
-	private PreparedStatement projectsByName;
-
 	private Connection sqlConnection = null;
 
 	public DatastoreInterface() {
@@ -61,7 +64,7 @@ public final class DatastoreInterface {
 			this.projectById = sqlConnection.prepareStatement(SELECT_PROJECY_BY_ID_PREP);
 			this.userByName = sqlConnection.prepareStatement(SELECT_USER_BY_NAME_PREP);
 			this.insertUser = sqlConnection.prepareStatement(INSERT_USER_PREP);
-			this.projectsByName = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_NAME);
+			this.projectsByName = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_NAME_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -110,6 +113,8 @@ public final class DatastoreInterface {
 				project.setId(resultSet.getInt("id"));
 				project.setTitle(resultSet.getString("title"));
 				project.setDescription(resultSet.getString("description"));
+				project.setCity(new City(resultSet.getString("city")));
+				project.setCategory(new Category(resultSet.getString("category")));
 				projects.add(project);
 			}
 		} catch (SQLException e) {

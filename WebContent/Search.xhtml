@@ -63,6 +63,18 @@
 				        <h:outputText value="#{project.description}" />
 				    </h:column>
 				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="City" />
+				        </f:facet>
+				        <h:outputText value="#{project.city.name}" />
+				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Category" />
+				        </f:facet>
+				        <h:outputText value="#{project.category.name}" />
+				    </h:column>
+				    <h:column>
 				    	<f:facet name="header">
 				            <h:outputText value="Detail" />
 				        </f:facet>
