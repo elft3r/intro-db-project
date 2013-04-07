@@ -2,12 +2,7 @@ package ch.ethz.inf.utils;
 
 public class StringUtils {
 	public static boolean isNullOrEmpty(String str) {
-		boolean res = false;
-		if(str == null || str.isEmpty()) {
-			res = true;
-		}
-		
-		return res;
+		return (str == null || str.trim().isEmpty());
 	}
 	
 	public static boolean isNotNullOrEmpty(String str) {

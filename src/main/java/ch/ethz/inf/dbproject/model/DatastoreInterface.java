@@ -39,6 +39,9 @@ public final class DatastoreInterface {
 	private static final String SELECT_USER_BY_NAME_PREP = "SELECT * FROM user WHERE username = ?";
 	private PreparedStatement userByName;	
 	
+	private static final String INSERT_USER_PREP = "INSERT INTO user (username, password) VALUES (?, ?)";
+	private PreparedStatement insertUser;
+	
 	private Connection sqlConnection = null;
 
 	public DatastoreInterface() {
@@ -54,6 +57,7 @@ public final class DatastoreInterface {
 			this.faByProject = sqlConnection.prepareStatement(SELECT_FUNDING_AMOUNT_PREP);
 			this.projectById = sqlConnection.prepareStatement(SELECT_PROJECY_BY_ID_PREP);
 			this.userByName = sqlConnection.prepareStatement(SELECT_USER_BY_NAME_PREP);
+			this.insertUser = sqlConnection.prepareStatement(INSERT_USER_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -126,5 +130,17 @@ public final class DatastoreInterface {
 			logger.log(Level.WARNING, "Failed to retrieve user by name", e);
 		}
 		return user;
+	}
+
+	public User createUser(String username, String password) {
+		try {
+			insertUser.setString(1, username);
+			insertUser.setString(2, password);
+			insertUser.executeUpdate();
+			return getUserBy(username);
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to insert new user", e);
+		}
+		return null;
 	}
 }

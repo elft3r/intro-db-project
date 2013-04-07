@@ -35,6 +35,13 @@
 					<div class="menuDiv2"><a href="Projects.jsf?category=other">...</a></div>
 					<div class="menuDiv1"><a href="Search.jsf">Search</a></div>
 					<div class="menuDiv1"><a href="User.jsf">User Profile</a></div>
+					<h:panelGroup rendered="#{sessionData.user != null}">
+						<div class="menuDiv1">
+							<h:form>
+								<h:commandLink action="#{userController.logout}">Logout</h:commandLink>
+							</h:form>
+						</div>
+					</h:panelGroup>
 					
 				</td>
 				

@@ -8,6 +8,7 @@ import javax.faces.context.FacesContext;
 
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
 import ch.ethz.inf.dbproject.model.User;
+import ch.ethz.inf.utils.StringUtils;
 
 @ManagedBean
 @RequestScoped
@@ -22,13 +23,47 @@ public class UserController {
 	
 	public String login(){
 		User user = dbInterface.getUserBy(username);
-		if(user != null){ // success
+		if(user != null && user.getPassword().equals(password)){ // success
 			sessionData.setUser(user);
 		}else{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("User or Password is invalid"));
+			addMessage("Username or Password is invalid");
 		}
 		
 		return "User.jsf";
+	}
+	
+	public String logout(){
+		sessionData.setUser(null);
+		return "User.jsf";
+	}
+
+	public String register(){
+		// input validation
+		if(StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)){
+			addMessage("Username and Password are required");
+			return "User.jsf";
+		}
+
+		// check for duplicate user
+		if(dbInterface.getUserBy(username) != null){
+			addMessage("Username already in use!");
+			return "User.jsf";
+		}
+		
+		// insert user
+		sessionData.setUser(dbInterface.createUser(username, password));
+		if(sessionData.getUser() == null){
+			addMessage("Create user failed!");
+		}
+		
+		return "User.jsf";
+	}
+	
+	/**
+	 * Adds an information message, which will be displayed on the next site.
+	 */
+	public void addMessage(String text){
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(text));
 	}
 
 	public String getUsername() {
