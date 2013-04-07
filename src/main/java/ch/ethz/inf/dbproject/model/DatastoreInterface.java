@@ -18,15 +18,15 @@ import ch.ethz.inf.dbproject.database.DatabaseConnection;
  */
 public final class DatastoreInterface {
 	private static final Logger logger = Logger.getLogger(DatastoreInterface.class.getName());
-	
+
 	private static final String SELECT_ALL_PROJECTS = "SELECT * FROM project";
-	
+
 	/**
 	 * {@link PreparedStatement} for retrieving the funding amounts for a single project
 	 */
 	private static final String SELECT_FUNDING_AMOUNT_PREP = "SELECT * FROM funding_amount WHERE project_id = ?";
 	private PreparedStatement faByProject;
-	
+
 	/**
 	 * {@link PreparedStatement} for retrieving a single project
 	 */
@@ -37,11 +37,14 @@ public final class DatastoreInterface {
 	 * {@link PreparedStatement} for retrieving a single user
 	 */
 	private static final String SELECT_USER_BY_NAME_PREP = "SELECT * FROM user WHERE username = ?";
-	private PreparedStatement userByName;	
-	
+	private PreparedStatement userByName;
+
 	private static final String INSERT_USER_PREP = "INSERT INTO user (username, password) VALUES (?, ?)";
 	private PreparedStatement insertUser;
-	
+
+	private static final String SELECT_PROJECTS_BY_NAME = "select * from project where title like ?";
+	private PreparedStatement projectsByName;
+
 	private Connection sqlConnection = null;
 
 	public DatastoreInterface() {
@@ -51,13 +54,14 @@ public final class DatastoreInterface {
 		} catch (Exception e) {
 			logger.log(Level.WARNING, "Errro while connection to DB!", e);
 		}
-		
+
 		// in here we specify all the prepared statements we need
 		try {
 			this.faByProject = sqlConnection.prepareStatement(SELECT_FUNDING_AMOUNT_PREP);
 			this.projectById = sqlConnection.prepareStatement(SELECT_PROJECY_BY_ID_PREP);
 			this.userByName = sqlConnection.prepareStatement(SELECT_USER_BY_NAME_PREP);
 			this.insertUser = sqlConnection.prepareStatement(INSERT_USER_PREP);
+			this.projectsByName = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_NAME);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -65,46 +69,64 @@ public final class DatastoreInterface {
 
 	public final Project getProjectById(final int id) {
 		Project res = null;
-		
+
 		try {
 			projectById.setInt(1, id);
-			
+
 			try (ResultSet rs = projectById.executeQuery();) {
-				if(rs.next()) {
+				if (rs.next()) {
 					res = new Project(rs);
 				}
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve Project with id = '" + id + "'.", e);
 		}
-		
+
 		return res;
 	}
 
 	public final List<Project> getAllProjects() {
 		List<Project> projects = new ArrayList<>();
-		
-		try(Statement stmt = this.sqlConnection.createStatement();
+
+		try (Statement stmt = this.sqlConnection.createStatement();
 				ResultSet rs = stmt.executeQuery(SELECT_ALL_PROJECTS);) {
-			while(rs.next()) {
+			while (rs.next()) {
 				projects.add(new Project(rs));
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve the projects!", e);
 		}
-		
+
+		return projects;
+	}
+
+	public List<Project> getProjectsByName(String name) {
+		List<Project> projects = new ArrayList<>();
+		try {
+			projectsByName.setString(1, "%" + name + "%");
+			ResultSet resultSet = projectsByName.executeQuery();
+			while (resultSet.next()) {
+				Project project = new Project();
+				project.setId(resultSet.getInt("id"));
+				project.setTitle(resultSet.getString("title"));
+				project.setDescription(resultSet.getString("description"));
+				projects.add(project);
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve projects", e);
+		}
 		return projects;
 	}
 
 	public List<Amount> getAmountsOfProject(int projectId) {
 		List<Amount> res = new ArrayList<>();
-		
+
 		// set the projectId into the prepared statement
 		try {
 			faByProject.setInt(1, projectId);
-			
+
 			try (ResultSet rs = faByProject.executeQuery();) {
-				while(rs.next()) {
+				while (rs.next()) {
 					res.add(new Amount(rs));
 				}
 			}
@@ -117,10 +139,10 @@ public final class DatastoreInterface {
 
 	public User getUserBy(String name) {
 		User user = null;
-		try{
+		try {
 			userByName.setString(1, name);
 			ResultSet resultSet = userByName.executeQuery();
-			if(resultSet.first()){
+			if (resultSet.first()) {
 				user = new User();
 				user.setId(resultSet.getInt("id"));
 				user.setUsername(resultSet.getString("username"));

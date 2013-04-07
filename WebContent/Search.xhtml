@@ -52,21 +52,15 @@
 							 styleClass="projectsTable" rendered="#{not empty searchController.projects}">
 				    <h:column>
 				        <f:facet name="header">
-				            <h:outputText value="Project Name" />
+				            <h:outputText value="Project Title" />
 				        </f:facet>
-				        <h:outputText value="#{project.name}" />
+				        <h:outputText value="#{project.title}" />
 				    </h:column>
 				    <h:column>
 				        <f:facet name="header">
-				            <h:outputText value="Field 2" />
+				            <h:outputText value="Description" />
 				        </f:facet>
-				        <h:outputText value="#{project.field2}" />
-				    </h:column>
-				    <h:column>
-				        <f:facet name="header">
-				            <h:outputText value="Field 3" />
-				        </f:facet>
-				        <h:outputText value="#{project.field3}" />
+				        <h:outputText value="#{project.description}" />
 				    </h:column>
 				    <h:column>
 				    	<f:facet name="header">

@@ -23,11 +23,8 @@ public class SearchController {
 
 	public String search(){
 
-		if(name != null) {
-
-			// TODO implement this!
-			// projects.add(this.dbInterface.searchByName(name));
-			
+		if (name != null) {
+			projects = dbInterface.getProjectsByName(name);
 		} else if (category != null) {
 
 			// TODO implement this!
