@@ -16,60 +16,60 @@ import ch.ethz.inf.utils.StringUtils;
 @ManagedBean
 @RequestScoped
 public class UserController {
-	
+
 	private final DatastoreInterface dbInterface = new DatastoreInterface();
-	
+
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;
 	private String username;
 	private String password;
-	
-	public String login(){
+
+	public String login() {
 		User user = dbInterface.getUserBy(username);
-		if(user != null && user.getPassword().equals(password)){ // success
+		if (user != null && user.getPassword().equals(password)) { // success
 			sessionData.setUser(user);
-		}else{
+		} else {
 			addMessage("Username or Password is invalid");
 		}
-		
+
 		return "User.jsf";
 	}
-	
-	public String logout(){
+
+	public String logout() {
 		sessionData.setUser(null);
 		return "User.jsf";
 	}
 
-	public String register(){
+	public String register() {
 		// input validation
-		if(StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)){
+		if (StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)) {
 			addMessage("Username and Password are required");
 			return "User.jsf";
 		}
 
 		// check for duplicate user
-		if(dbInterface.getUserBy(username) != null){
+		if (dbInterface.getUserBy(username) != null) {
 			addMessage("Username already in use!");
 			return "User.jsf";
 		}
-		
+
 		// insert user
 		sessionData.setUser(dbInterface.createUser(username, password));
-		if(sessionData.getUser() == null){
+		if (sessionData.getUser() == null) {
 			addMessage("Create user failed!");
 		}
-		
+
 		return "User.jsf";
 	}
-	
-	public List<FundingAmount> getFundingAmounts(){
+
+	public List<FundingAmount> getFundingAmounts() {
 		return dbInterface.getFundsByUserId(sessionData.getUser().getId());
 	}
-	
+
 	/**
 	 * Adds an information message, which will be displayed on the next site.
 	 */
-	public void addMessage(String text){
+	public void addMessage(String text) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(text));
 	}
 
