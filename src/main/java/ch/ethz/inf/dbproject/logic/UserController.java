@@ -11,6 +11,7 @@ import javax.faces.context.FacesContext;
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
 import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.User;
+import ch.ethz.inf.utils.FacesContextUtils;
 import ch.ethz.inf.utils.StringUtils;
 
 @ManagedBean
@@ -29,7 +30,7 @@ public class UserController {
 		if (user != null && user.getPassword().equals(password)) { // success
 			sessionData.setUser(user);
 		} else {
-			addMessage("Username or Password is invalid");
+			FacesContextUtils.showMessage("Username or Password is invalid");
 		}
 
 		return null;
@@ -43,15 +44,15 @@ public class UserController {
 	public String register() {
 		// input validation
 		if (StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)) {
-			addMessage("Username and Password are required");
+			FacesContextUtils.showMessage("Username and Password are required");
 		} else if (dbInterface.getUserBy(username) != null) {
 			// check for duplicate user
-			addMessage("Username already in use!");
+			FacesContextUtils.showMessage("Username already in use!");
 		} else {
 			// insert user
 			sessionData.setUser(dbInterface.createUser(username, password));
 			if (sessionData.getUser() == null) {
-				addMessage("Create user failed!");
+				FacesContextUtils.showMessage("Create user failed!");
 			}
 		}
 
@@ -60,13 +61,6 @@ public class UserController {
 
 	public List<FundingAmount> getFundingAmounts() {
 		return dbInterface.getFundsByUserId(sessionData.getUser().getId());
-	}
-
-	/**
-	 * Adds an information message, which will be displayed on the next site.
-	 */
-	public void addMessage(String text) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(text));
 	}
 
 	public String getUsername() {
