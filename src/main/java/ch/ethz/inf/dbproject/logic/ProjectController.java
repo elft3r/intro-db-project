@@ -41,7 +41,7 @@ public class ProjectController implements Serializable {
 	public void init() {
 		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 		String id = context.getRequestParameterMap().get("id");
-		if (StringUtils.isNotNullOrEmpty(id)) {
+		if (StringUtils.isNotNullNorEmpty(id)) {
 			projectId = Integer.valueOf(id);
 		}
 
@@ -62,7 +62,7 @@ public class ProjectController implements Serializable {
 	public String support() {
 		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 		String id = context.getRequestParameterMap().get("fundingAmountId");
-		if (StringUtils.isNotNullOrEmpty(id)) {
+		if (StringUtils.isNotNullNorEmpty(id)) {
 			int fundingAmountId = Integer.valueOf(id);
 			DatastoreInterface dbInterface = new DatastoreInterface();
 			dbInterface.fundProject(sessionData.getUser().getId(), fundingAmountId);

@@ -5,7 +5,7 @@ public class StringUtils {
 		return (str == null || str.trim().isEmpty());
 	}
 	
-	public static boolean isNotNullOrEmpty(String str) {
+	public static boolean isNotNullNorEmpty(String str) {
 		return !StringUtils.isNullOrEmpty(str);
 	}
 }
