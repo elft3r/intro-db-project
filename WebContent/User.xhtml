@@ -57,24 +57,7 @@
 				
 				<!-- User not logged in. Display the login form. -->
 				<h:panelGroup rendered="#{sessionData.user == null}">
-					<h:form>
-					<table>
-						<tr>
-							<th>Username</th>
-							<td><h:inputText value="#{userController.username}" /></td>
-						</tr>
-						<tr>
-							<th>Password</th>
-							<td><h:inputSecret value="#{userController.password}" /></td>
-						</tr>
-						<tr>
-							<th colspan="2" align="right">
-								<h:commandButton value="Register" action="#{userController.register}" />
-								<h:commandButton value="Login" action="#{userController.login}" />
-							</th>
-						</tr>
-					</table>
-					</h:form>
+					<ui:include src="snippets/loginSnippet.xhtml" />
 				</h:panelGroup>
     		</ui:define>
     	</ui:composition>
