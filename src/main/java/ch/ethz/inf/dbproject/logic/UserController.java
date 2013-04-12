@@ -32,34 +32,30 @@ public class UserController {
 			addMessage("Username or Password is invalid");
 		}
 
-		return "User.jsf";
+		return null;
 	}
 
 	public String logout() {
 		sessionData.setUser(null);
-		return "User.jsf";
+		return null;
 	}
 
 	public String register() {
 		// input validation
 		if (StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)) {
 			addMessage("Username and Password are required");
-			return "User.jsf";
-		}
-
-		// check for duplicate user
-		if (dbInterface.getUserBy(username) != null) {
+		} else if (dbInterface.getUserBy(username) != null) {
+			// check for duplicate user
 			addMessage("Username already in use!");
-			return "User.jsf";
+		} else {
+			// insert user
+			sessionData.setUser(dbInterface.createUser(username, password));
+			if (sessionData.getUser() == null) {
+				addMessage("Create user failed!");
+			}
 		}
 
-		// insert user
-		sessionData.setUser(dbInterface.createUser(username, password));
-		if (sessionData.getUser() == null) {
-			addMessage("Create user failed!");
-		}
-
-		return "User.jsf";
+		return null;
 	}
 
 	public List<FundingAmount> getFundingAmounts() {
