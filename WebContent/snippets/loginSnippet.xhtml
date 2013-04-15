@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	
+	<br />
+	<h4>Please Login or Register</h4>
+	<h:form>
+		<table>
+			<tr>
+				<th>Username</th>
+				<td><h:inputText value="#{userController.username}" /></td>
+			</tr>
+			<tr>
+				<th>Password</th>
+				<td><h:inputSecret value="#{userController.password}" /></td>
+			</tr>
+			<tr>
+				<th colspan="2" align="right">
+					<h:commandButton value="Register" action="#{userController.register}" />
+					<h:commandButton value="Login" action="#{userController.login}" />
+				</th>
+			</tr>
+		</table>
+	</h:form>
+</ui:composition>

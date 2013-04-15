@@ -1,6 +1,8 @@
 package ch.ethz.inf.dbproject.model;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Object that represents a registered in user.
@@ -20,6 +22,11 @@ public final class User implements Serializable {
 		this.id = id;
 		this.username = username;
 		this.password = password;
+	}
+	
+	public User(final ResultSet rs) throws SQLException {
+		this.id = rs.getInt("id");
+		this.username = rs.getString("username");
 	}
 
 	public int getId() {
