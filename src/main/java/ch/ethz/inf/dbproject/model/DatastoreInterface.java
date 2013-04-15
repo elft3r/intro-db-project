@@ -1,6 +1,7 @@
 package ch.ethz.inf.dbproject.model;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import ch.ethz.inf.dbproject.database.DatabaseConnection;
+import ch.ethz.inf.utils.StringUtils;
 
 /**
  * This class should be the interface between the web application and the database. Keeping all the
@@ -18,6 +20,14 @@ import ch.ethz.inf.dbproject.database.DatabaseConnection;
  */
 public final class DatastoreInterface {
 	private static final Logger logger = Logger.getLogger(DatastoreInterface.class.getName());
+
+	private static final String SELECT_ALL_CATEGORIES = "SELECT * FROM category";
+	private static final String SELECT_CATEGORY_BY_ID_PREP = "SELECT * FROM category WHERE id = ?";
+	private PreparedStatement categoryById;
+
+	private static final String SELECT_ALL_CITIES = "SELECT * FROM city";
+	private static final String SELECT_CITY_BY_ID_PREP = "SELECT * FROM city WHERE id = ?";
+	private PreparedStatement cityById;
 
 	private static final String SELECT_ALL_PROJECTS = "SELECT * FROM project";
 
@@ -62,11 +72,24 @@ public final class DatastoreInterface {
 	private static final String SELECT_USER_BY_NAME_PREP = "SELECT * FROM user WHERE username = ?";
 	private PreparedStatement userByName;
 
+	private static final String SELECT_USER_BY_ID_PREP = "SELECT * FROM user WHERE id = ?";
+	private PreparedStatement userById;
+
 	private static final String INSERT_USER_PREP = "INSERT INTO user (username, password) VALUES (?, ?)";
 	private PreparedStatement insertUser;
 
 	private static final String INSERT_FUND_PREP = "INSERT INTO funds (user_id, fa_id) values(?, ?)";
 	private PreparedStatement insertFund;
+
+	private static final String INSERT_CITY_PREP = "INSERT INTO city (name) VALUES (?)";
+	private PreparedStatement insertCity;
+
+	private static final String INSERT_CATEGORY_PREP = "INSERT INTO category (name) VALUES (?)";
+	private PreparedStatement insertCategory;
+
+	private static final String INSERT_PROJECT_PREP = "INSERT INTO project (title, description, goal, start_date, "
+			+ "end_date, city_id, category_id, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	private PreparedStatement insertProject;
 
 	private Connection sqlConnection = null;
 
@@ -89,6 +112,14 @@ public final class DatastoreInterface {
 			this.projectsByCity = sqlConnection.prepareStatement(SELECT_PROJECTS_BY_CITY_PREP);
 			this.fundsByUser = sqlConnection.prepareStatement(SELECT_FUNDS_BY_USER);
 			this.insertFund = sqlConnection.prepareStatement(INSERT_FUND_PREP);
+			this.insertCity = sqlConnection.prepareStatement(INSERT_CITY_PREP, PreparedStatement.RETURN_GENERATED_KEYS);
+			this.insertCategory = sqlConnection.prepareStatement(INSERT_CATEGORY_PREP,
+					PreparedStatement.RETURN_GENERATED_KEYS);
+			this.insertProject = sqlConnection.prepareStatement(INSERT_PROJECT_PREP,
+					PreparedStatement.RETURN_GENERATED_KEYS);
+			this.categoryById = sqlConnection.prepareStatement(SELECT_CATEGORY_BY_ID_PREP);
+			this.userById = sqlConnection.prepareStatement(SELECT_USER_BY_ID_PREP);
+			this.cityById = sqlConnection.prepareStatement(SELECT_CITY_BY_ID_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -127,8 +158,28 @@ public final class DatastoreInterface {
 		return projects;
 	}
 
+	/**
+	 * Returns a list of {@link Project}s that have a similar name
+	 */
 	public List<Project> getProjectsByName(String name) {
 		return retrieveProjects(projectsByName, name);
+	}
+
+	/**
+	 * @return {@link Project} with the identical name or null
+	 */
+	public Project getProjectByName(String name) {
+		Project res = null;
+		if (StringUtils.isNotNullNorEmpty(name)) {
+			for (Project p : getProjectsByName(name)) {
+				// here we only care about the identical names
+				if (name.equals(p.getTitle())) {
+					res = p;
+					break;
+				}
+			}
+		}
+		return res;
 	}
 
 	public List<Project> getProjectsByCategory(String name) {
@@ -145,13 +196,7 @@ public final class DatastoreInterface {
 			retrieveProjectsStatement.setString(1, "%" + name + "%");
 			ResultSet resultSet = retrieveProjectsStatement.executeQuery();
 			while (resultSet.next()) {
-				Project project = new Project();
-				project.setId(resultSet.getInt("id"));
-				project.setTitle(resultSet.getString("title"));
-				project.setDescription(resultSet.getString("description"));
-				project.setCity(new City(resultSet.getString("city")));
-				project.setCategory(new Category(resultSet.getString("category")));
-				projects.add(project);
+				projects.add(new Project(resultSet));
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve projects", e);
@@ -244,5 +289,176 @@ public final class DatastoreInterface {
 			logger.log(Level.WARNING, "Failed to insert fund with userId = " + userId + " and fundingAmountId = "
 					+ fundingAmountId, e);
 		}
+	}
+
+	public List<Category> getAllCategories() {
+		List<Category> categories = new ArrayList<>();
+
+		try (Statement stmt = this.sqlConnection.createStatement();
+				ResultSet rs = stmt.executeQuery(SELECT_ALL_CATEGORIES);) {
+			while (rs.next()) {
+				categories.add(new Category(rs));
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the categories!", e);
+		}
+
+		return categories;
+	}
+
+	public List<City> getAllCities() {
+		List<City> cities = new ArrayList<>();
+
+		try (Statement stmt = this.sqlConnection.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL_CITIES);) {
+			while (rs.next()) {
+				cities.add(new City(rs));
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the cities!", e);
+		}
+
+		return cities;
+	}
+
+	public City createCity(String name) {
+		City res = null;
+
+		try {
+			insertCity.setString(1, name);
+			if (insertCity.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+
+			// now we create the city including the generated ID
+			try (ResultSet rs = insertCity.getGeneratedKeys()) {
+				if (rs.next()) {
+					// first make sure that we have all the values needed for the class
+					// so if no ID is retrieved we will return null
+					City tmp = new City(name);
+					tmp.setId(rs.getInt(1));
+
+					res = tmp;
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to create the city \"" + name + "\"!", e);
+		}
+
+		return res;
+	}
+
+	public Category createCategory(String name) {
+		Category res = null;
+
+		try {
+			insertCategory.setString(1, name);
+			if (insertCategory.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+
+			// now we create the category object including the generated ID
+			try (ResultSet rs = insertCategory.getGeneratedKeys()) {
+				if (rs.next()) {
+					// first make sure that we have all the needed values for the new category
+					// so if no ID is retrieved we will return null
+					Category tmp = new Category(name);
+					tmp.setId(rs.getInt(1));
+
+					res = tmp;
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to create the category \"" + name + "\"!", e);
+		}
+
+		return res;
+	}
+
+	public Project createProject(Project project) {
+		Project res = null;
+
+		try {
+			insertProject.setString(1, project.getTitle());
+			insertProject.setString(2, project.getDescription());
+			insertProject.setBigDecimal(3, project.getGoal());
+			insertProject.setDate(4, new Date(project.getStartDate().getTime()));
+			insertProject.setDate(5, new Date(project.getEndDate().getTime()));
+			insertProject.setInt(6, project.getCity() != null ? project.getCity().getId() : null);
+			insertProject.setInt(7, project.getCategory() != null ? project.getCategory().getId() : null);
+			insertProject.setInt(8, project.getOwner() != null ? project.getOwner().getId() : null);
+
+			if (insertProject.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+
+			try (ResultSet rs = insertProject.getGeneratedKeys()) {
+				if (rs.next()) {
+					// when we are here we get the generated ID for the project and add it to the
+					// object we will return if the retrieval of the ID fails we will not return the
+					// project, to indicate that something went
+					project.setId(rs.getInt(1));
+					res = project;
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to create the project \"" + project.getTitle() + "\"!", e);
+		}
+
+		return res;
+	}
+
+	public Category getCategoryById(int id) {
+		Category res = null;
+
+		try {
+			categoryById.setInt(1, id);
+
+			try (ResultSet rs = categoryById.executeQuery()) {
+				if (rs.next()) {
+					res = new Category(rs);
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the category with \"" + id + "\"!", e);
+		}
+
+		return res;
+	}
+
+	public User getUserById(int id) {
+		User res = null;
+
+		try {
+			userById.setInt(1, id);
+
+			try (ResultSet rs = userById.executeQuery()) {
+				if (rs.next()) {
+					res = new User(rs);
+				}
+
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve user with \"" + id + "\"!", e);
+		}
+
+		return res;
+	}
+
+	public City getCityById(int id) {
+		City res = null;
+
+		try {
+			cityById.setInt(1, id);
+
+			try (ResultSet rs = cityById.executeQuery()) {
+				if (rs.next()) {
+					res = new City(rs);
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve city with \"" + id + "\"!", e);
+		}
+
+		return res;
 	}
 }

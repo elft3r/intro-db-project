@@ -6,7 +6,31 @@
       xmlns:ui="http://java.sun.com/jsf/facelets">
  
     <h:head>
-		<link href="style.css" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" href="style.css" type="text/css" />
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+		<script src="http://code.jquery.com/jquery-1.9.1.js" />
+		<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" />
+		<script>
+			$(function() {
+				$(".datepicker").datepicker({
+					showOn : "button",
+					buttonImage : "images/calendar.gif",
+					buttonImageOnly : true
+				});
+			});
+			
+			$(function() {
+				$(".categoryTags").autocomplete({
+					source: #{newProjectController.categories}
+				});
+			});
+
+			$(function() {
+				$(".cityTags").autocomplete({
+					source: #{newProjectController.cities}
+				});
+			});
+		</script>
     </h:head>
  
     <h:body>
@@ -24,6 +48,7 @@
 					
 					<div class="menuDiv1"></div>
 					<div class="menuDiv1"><a href="Home.jsf">Home</a></div>
+					<div class="menuDiv1"><a href="NewProject.jsf">Create new Project</a></div>
 					<div class="menuDiv1"><a href="Projects.jsf">All projects</a></div>
 					<div class="menuDiv2"><a href="Projects.jsf?filter=popular">Most popular</a></div>
 					<div class="menuDiv2"><a href="Projects.jsf?filter=funded">Most funded</a></div>

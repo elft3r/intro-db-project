@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:body>
+	<ui:composition template="template.xhtml">
+		<ui:define name="content">
+			<h2>Create New Project</h2>
+		
+			<!-- When the user is logged in he can create a new project -->
+			<h:panelGroup rendered="#{sessionData.user != null}">
+				<h:form>
+					<table>
+						<tr>
+							<th>Title</th>
+							<td><h:inputText value="#{newProjectController.title}" /></td>
+						</tr>
+						<tr>
+							<th>Description</th>
+							<td><h:inputTextarea value="#{newProjectController.description}"/></td>
+						</tr>
+						<tr>
+							<th>Goal</th>
+							<td>
+								<h:inputText value="#{newProjectController.goal}">
+									<f:convertNumber type="currency" />
+								</h:inputText>
+							</td>
+						</tr>
+						<tr>
+							<th>Start Date</th>
+							<td>
+								<h:inputText value="#{newProjectController.startDate}"
+									styleClass="datepicker">
+									<f:convertDateTime pattern="MM/dd/yyyy" />
+								</h:inputText>
+							</td>
+						</tr>
+						<tr>
+							<th>End Date</th>
+							<td>
+								<h:inputText value="#{newProjectController.endDate}"
+									styleClass="datepicker">
+									<f:convertDateTime pattern="MM/dd/yyyy" />
+								</h:inputText>
+							</td>
+						</tr>
+						<tr>
+							<th>City</th>
+							<td>
+								<h:inputText value="#{newProjectController.city}" styleClass="cityTags" />
+							</td>
+						</tr>
+						<tr>
+							<th>Category</th>
+							<td>
+								<h:inputText value="#{newProjectController.category}" styleClass="categoryTags" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<h:commandButton value="Create" action="#{newProjectController.create}" />
+							</td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
+				</h:form>
+			</h:panelGroup>
+
+			<!-- When the user is not logged in he needs to register or log in -->
+			<h:panelGroup rendered="#{sessionData.user == null}">
+				<ui:include src="snippets/loginSnippet.xhtml" />
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>
