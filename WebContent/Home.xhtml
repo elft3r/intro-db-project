@@ -9,7 +9,7 @@
     	<ui:composition template="template.xhtml">
  
     		<ui:define name="content">
-    			<h:outputText value="Welcome back #{sessionData.user.name}" rendered="#{sessionData.user.name != null}" />
+    			<h:outputText value="Welcome back #{sessionData.user.username}" rendered="#{sessionData.user.username != null}" />
     			<h:outputText value="Welcome!" rendered="#{sessionData.user == null}" />
     			
     			<br/>

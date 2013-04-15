@@ -1,7 +1,8 @@
 package ch.ethz.inf.dbproject.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -9,25 +10,39 @@ public final class Project implements Serializable {
 
 	private static final long serialVersionUID = 413320471268725530L;
 
+	/**
+	 * we only we want to initialize this, if we really need t get either the whole user, city or
+	 * category
+	 */
+	private DatastoreInterface dbInterface = null;
+
 	private int id;
 	private String title;
 	private String description;
 	private Date startDate;
 	private Date endDate;
+	private int cityId;
 	private City city;
+	private int categoryId;
 	private Category category;
-	private User owner;
+	private int ownerId;
+	private User user;
+	private BigDecimal goal;
 
 	public Project() {
 
 	}
 
 	public Project(final ResultSet rs) throws SQLException {
-		// TODO These need to be adapted to your schema
-		// TODO Extra properties need to be added
-		this.id = rs.getInt("id");
-		this.title = rs.getString("title");
+		this.categoryId = rs.getInt("category_id");
+		this.cityId = rs.getInt("city_id");
 		this.description = rs.getString("description");
+		this.endDate = rs.getDate("end_date");
+		this.goal = rs.getBigDecimal("goal");
+		this.id = rs.getInt("id");
+		this.ownerId = rs.getInt("owner_id");
+		this.startDate = rs.getDate("start_date");
+		this.title = rs.getString("title");
 	}
 
 	public String getTitle() {
@@ -70,27 +85,62 @@ public final class Project implements Serializable {
 		this.endDate = endDate;
 	}
 
+	public int getCityId() {
+		return cityId;
+	}
+
 	public City getCity() {
+		if (city == null) {
+			initDbInterface();
+			city = dbInterface.getCityById(cityId);
+		}
+
 		return city;
 	}
 
-	public void setCity(City city) {
-		this.city = city;
+	public void setCityId(int id) {
+		this.cityId = id;
+	}
+
+	public int getCategoryId() {
+		return categoryId;
 	}
 
 	public Category getCategory() {
+		if (category == null) {
+			initDbInterface();
+			category = dbInterface.getCategoryById(categoryId);
+		}
+
 		return category;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCategoryId(int id) {
+		this.categoryId = id;
 	}
 
 	public User getOwner() {
-		return owner;
+		if (user == null) {
+			initDbInterface();
+			user = dbInterface.getUserById(ownerId);
+		}
+
+		return user;
 	}
 
-	public void setOwner(User owner) {
-		this.owner = owner;
+	public void setOwnerId(int id) {
+		this.ownerId = id;
+	}
+
+	public BigDecimal getGoal() {
+		return goal;
+	}
+
+	public void setGoal(BigDecimal goal) {
+		this.goal = goal;
+	}
+
+	private void initDbInterface() {
+		dbInterface = new DatastoreInterface();
 	}
 }

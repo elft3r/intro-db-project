@@ -20,7 +20,7 @@ public class SqlUtils {
 			
 			while((str = in.readLine()) != null) {
 				// we skip the empty lines and '\n'
-				if(StringUtils.isNotNullOrEmpty(str)) {
+				if(StringUtils.isNotNullNorEmpty(str)) {
 					sb.append(str);
 					sb.append("\n");
 				}

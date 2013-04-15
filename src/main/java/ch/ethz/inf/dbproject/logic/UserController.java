@@ -11,66 +11,56 @@ import javax.faces.context.FacesContext;
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
 import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.User;
+import ch.ethz.inf.utils.FacesContextUtils;
 import ch.ethz.inf.utils.StringUtils;
 
 @ManagedBean
 @RequestScoped
 public class UserController {
-	
+
 	private final DatastoreInterface dbInterface = new DatastoreInterface();
-	
+
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;
 	private String username;
 	private String password;
-	
-	public String login(){
+
+	public String login() {
 		User user = dbInterface.getUserBy(username);
-		if(user != null && user.getPassword().equals(password)){ // success
+		if (user != null && user.getPassword().equals(password)) { // success
 			sessionData.setUser(user);
-		}else{
-			addMessage("Username or Password is invalid");
+		} else {
+			FacesContextUtils.showMessage("Username or Password is invalid");
 		}
-		
-		return "User.jsf";
+
+		return null;
 	}
-	
-	public String logout(){
+
+	public String logout() {
 		sessionData.setUser(null);
-		return "User.jsf";
+		return null;
 	}
 
-	public String register(){
+	public String register() {
 		// input validation
-		if(StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)){
-			addMessage("Username and Password are required");
-			return "User.jsf";
+		if (StringUtils.isNullOrEmpty(username) || StringUtils.isNullOrEmpty(password)) {
+			FacesContextUtils.showMessage("Username and Password are required");
+		} else if (dbInterface.getUserBy(username) != null) {
+			// check for duplicate user
+			FacesContextUtils.showMessage("Username already in use!");
+		} else {
+			// insert user
+			sessionData.setUser(dbInterface.createUser(username, password));
+			if (sessionData.getUser() == null) {
+				FacesContextUtils.showMessage("Create user failed!");
+			}
 		}
 
-		// check for duplicate user
-		if(dbInterface.getUserBy(username) != null){
-			addMessage("Username already in use!");
-			return "User.jsf";
-		}
-		
-		// insert user
-		sessionData.setUser(dbInterface.createUser(username, password));
-		if(sessionData.getUser() == null){
-			addMessage("Create user failed!");
-		}
-		
-		return "User.jsf";
+		return null;
 	}
-	
-	public List<FundingAmount> getFundingAmounts(){
+
+	public List<FundingAmount> getFundingAmounts() {
 		return dbInterface.getFundsByUserId(sessionData.getUser().getId());
-	}
-	
-	/**
-	 * Adds an information message, which will be displayed on the next site.
-	 */
-	public void addMessage(String text){
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(text));
 	}
 
 	public String getUsername() {
