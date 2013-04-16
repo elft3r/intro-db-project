@@ -143,4 +143,16 @@ public final class Project implements Serializable {
 	private void initDbInterface() {
 		dbInterface = new DatastoreInterface();
 	}
+	
+	public String getRemainingFundingTime() {
+		String res = "Project is closed for funding!";
+		
+		long diff = endDate.getTime() - System.currentTimeMillis();
+		long diffDays = diff / (24 * 60 * 60 * 1000);
+		if(diffDays > 0) {
+			res = diffDays + " days remaining!";
+		}
+		
+		return res;
+	}
 }

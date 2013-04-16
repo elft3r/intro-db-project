@@ -56,6 +56,10 @@ public class NewProjectController implements Serializable {
 
 				// now create the project
 				project = dbInterface.createProject(project);
+				if(project == null) {
+					throw new Exception("Failed to create the new Project. Please try again!");
+				}
+				
 				FacesContextUtils.redirect("Project.jsf?id=" + project.getId());
 			}
 		} catch (Exception e) {

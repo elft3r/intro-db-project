@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -91,6 +92,16 @@ public final class DatastoreInterface {
 			+ "end_date, city_id, category_id, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	private PreparedStatement insertProject;
 
+	private static final String SELECT_COMMENTS_BY_PROJECT_ID = "SELECT * "
+			+ "FROM comment c INNER JOIN user u ON c.user_id = u.id "
+			+ "WHERE c.project_id = ? "
+			+ "ORDER BY c.id ASC";
+	private PreparedStatement commentsByProjectId;
+	
+	private static final String INSERT_COMMENT_PREP = "INSERT INTO comment(text, create_date, user_id, project_id)" +
+			"VALUES(?, ?, ?, ?)";
+	private PreparedStatement insertComment;
+
 	private Connection sqlConnection = null;
 
 	public DatastoreInterface() {
@@ -120,6 +131,9 @@ public final class DatastoreInterface {
 			this.categoryById = sqlConnection.prepareStatement(SELECT_CATEGORY_BY_ID_PREP);
 			this.userById = sqlConnection.prepareStatement(SELECT_USER_BY_ID_PREP);
 			this.cityById = sqlConnection.prepareStatement(SELECT_CITY_BY_ID_PREP);
+			this.commentsByProjectId = sqlConnection.prepareStatement(SELECT_COMMENTS_BY_PROJECT_ID);
+			this.insertComment = sqlConnection.prepareStatement(INSERT_COMMENT_PREP,
+					PreparedStatement.RETURN_GENERATED_KEYS);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -459,6 +473,54 @@ public final class DatastoreInterface {
 			logger.log(Level.WARNING, "Failed to retrieve city with \"" + id + "\"!", e);
 		}
 
+		return res;
+	}
+	
+	public List<Comment> getCommentsByProjectId(int id) {
+		List<Comment> res = new ArrayList<>();
+		
+		try {
+			commentsByProjectId.setInt(1, id);
+			
+			try (ResultSet rs = commentsByProjectId.executeQuery()) {
+				while (rs.next()) {
+					res.add(new Comment(rs));
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve comments for project with id=\"" + id + "\"!", e);
+		}
+		
+		return res;
+	}
+	
+	public Comment createComment(Comment comment) {
+		Comment res = null;
+		
+		try {
+			insertComment.setString(1, comment.getComment());
+			insertComment.setTimestamp(2, new Timestamp(comment.getCreateDate().getTime()));
+			insertComment.setInt(3, comment.getUserId());
+			insertComment.setInt(4, comment.getProjectId());
+			
+			if(insertComment.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+			
+			try(ResultSet rs = insertComment.getGeneratedKeys()) {
+				if (rs.next()) {
+					comment.setId(rs.getInt(1));
+					// When we are here this means that the comment was successfully created and
+					// that we
+					// were able to retrieve the key, so we can return it
+					res = comment;
+				}
+			}
+		} catch(SQLException e) {
+			logger.log(Level.WARNING, "Failed to create new comment for project with id=\"" + comment.getProjectId()
+					+ "\"!", e);
+		}
+		
 		return res;
 	}
 }
