@@ -101,6 +101,12 @@ public final class DatastoreInterface {
 	private static final String INSERT_COMMENT_PREP = "INSERT INTO comment(text, create_date, user_id, project_id)" +
 			"VALUES(?, ?, ?, ?)";
 	private PreparedStatement insertComment;
+	
+	/** Specify the days we want to show */
+	private static final int DAYS_TILL_ENDING = 10;
+	private static final String SELECT_SOON_ENDING_PROJECTS_PREP = "SELECT * FROM project WHERE end_date BETWEEN ? "
+			+ "AND ? ORDER BY end_date";
+	private PreparedStatement selectSoonEndingProjects;
 
 	private Connection sqlConnection = null;
 
@@ -134,6 +140,7 @@ public final class DatastoreInterface {
 			this.commentsByProjectId = sqlConnection.prepareStatement(SELECT_COMMENTS_BY_PROJECT_ID);
 			this.insertComment = sqlConnection.prepareStatement(INSERT_COMMENT_PREP,
 					PreparedStatement.RETURN_GENERATED_KEYS);
+			this.selectSoonEndingProjects = sqlConnection.prepareStatement(SELECT_SOON_ENDING_PROJECTS_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -519,6 +526,26 @@ public final class DatastoreInterface {
 		} catch(SQLException e) {
 			logger.log(Level.WARNING, "Failed to create new comment for project with id=\"" + comment.getProjectId()
 					+ "\"!", e);
+		}
+		
+		return res;
+	}
+	
+	public List<Project> getSoonEndingProjects() {
+		List<Project> res = new ArrayList<>();
+		
+		try {
+			long diff = DAYS_TILL_ENDING * 24 * 60 * 60 * 1000;
+			selectSoonEndingProjects.setDate(1, new Date(System.currentTimeMillis()));
+			selectSoonEndingProjects.setDate(2, new Date(System.currentTimeMillis() + diff));
+			
+			try(ResultSet rs = selectSoonEndingProjects.executeQuery()) {
+				while(rs.next()) {
+					res.add(new Project(rs));
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the soon ending Projects!", e);
 		}
 		
 		return res;

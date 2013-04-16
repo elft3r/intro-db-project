@@ -24,6 +24,12 @@
 				        </f:facet>
 				        <a href="Project.jsf?id=#{project.id}">View Project</a>
 				    </h:column>
+				    <h:column rendered="#{projectsController.filter eq 'ending'}">
+				        <f:facet name="header">
+				            <h:outputText value="Remaining Days" />
+				        </f:facet>
+						<h:outputText value="#{project.remainingFundingTime}"/>
+				    </h:column>
 				</h:dataTable>
 				<hr/>
     		</ui:define>

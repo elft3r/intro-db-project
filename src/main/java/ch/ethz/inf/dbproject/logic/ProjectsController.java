@@ -30,7 +30,6 @@ public class ProjectsController {
 		} else if (category != null) {
 			return dbInterface.getProjectsByCategory(category);
 		} else if (filter != null) {
-		
 			if(filter.equals("popular")) {
 
 				// TODO implement this!
@@ -42,10 +41,7 @@ public class ProjectsController {
 				// return dbInterface.getMostFundedProjects();
 
 			} else if (filter.equals("ending")) {
-
-				// TODO implement this!
-				// return dbInterface.getSoonEndingProjects();
-
+				 return dbInterface.getSoonEndingProjects();
 			}
 			
 		} else {
