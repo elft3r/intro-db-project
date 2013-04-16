@@ -38,10 +38,10 @@ public final class DatastoreInterface {
 			+ "where p.title like ?";
 	private PreparedStatement projectsByName;
 
-	private static final String SELECT_PROJECTS_BY_CATEGORY_PREP = "select p.id, p.title, p.description, p.goal, "
-			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
-			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
-			+ "where cat.name like ?";
+	private static final String SELECT_PROJECTS_BY_CATEGORY_PREP = "SELECT p.id, p.title, p.description, p.goal, "
+			+ "p.start_date, p.end_date, p.category_id, p.city_id, p.owner_id, c.name AS city, cat.name AS category "
+			+ "FROM project p INNER JOIN city c ON p.city_id = c.id INNER JOIN category cat ON p.category_id = cat.id "
+			+ "WHERE cat.name LIKE ?";
 	private PreparedStatement projectsByCategory;
 
 	private static final String SELECT_PROJECTS_BY_CITY_PREP = "select p.id, p.title, p.description, p.goal, "

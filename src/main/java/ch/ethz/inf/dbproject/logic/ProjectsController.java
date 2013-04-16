@@ -28,10 +28,7 @@ public class ProjectsController {
 			return dbInterface.getAllProjects();
 
 		} else if (category != null) {
-
-			// TODO implement this!
-			//return dbInterface.getProjectsByCategory(category);
-			
+			return dbInterface.getProjectsByCategory(category);
 		} else if (filter != null) {
 		
 			if(filter.equals("popular")) {
