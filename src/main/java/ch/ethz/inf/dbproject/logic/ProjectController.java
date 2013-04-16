@@ -1,7 +1,7 @@
 package ch.ethz.inf.dbproject.logic;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -15,6 +15,7 @@ import ch.ethz.inf.dbproject.model.Comment;
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
 import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.Project;
+import ch.ethz.inf.utils.FacesContextUtils;
 import ch.ethz.inf.utils.StringUtils;
 
 /**
@@ -29,7 +30,10 @@ public class ProjectController implements Serializable {
 
 	private static final long serialVersionUID = -6272753030255122907L;
 
-	private String comment;
+	private DatastoreInterface dbInterface = new DatastoreInterface();
+	
+	private String newComment;
+	private List<Comment> comments;
 	private int projectId;
 	private Project selectedProject;
 	private List<FundingAmount> fundingAmounts;
@@ -45,10 +49,9 @@ public class ProjectController implements Serializable {
 			projectId = Integer.valueOf(id);
 		}
 
-		DatastoreInterface dbInterface = new DatastoreInterface();
-
 		selectedProject = dbInterface.getProjectById(getProjectId());
 		fundingAmounts = dbInterface.getAmountsOfProject(projectId);
+		comments = dbInterface.getCommentsByProjectId(projectId);
 	}
 
 	public Project getSelectedProject() {
@@ -64,39 +67,44 @@ public class ProjectController implements Serializable {
 		String id = context.getRequestParameterMap().get("fundingAmountId");
 		if (StringUtils.isNotNullNorEmpty(id)) {
 			int fundingAmountId = Integer.valueOf(id);
-			DatastoreInterface dbInterface = new DatastoreInterface();
 			dbInterface.fundProject(sessionData.getUser().getId(), fundingAmountId);
 		}
 		return "User.jsf?faces-redirect=true";
 	}
 
 	public String addComment() {
+		try {
+			// get the user ID out of the session data
+			int userId = sessionData.getUser().getId();
 
-		// TODO implement this
-		// String username = UserManagement.getCurrentlyLoggedInUser(session).getUsername();
-		// Comment commentObj = new Comment(username, comment);
+			// build a new Comment object
+			Comment comment = new Comment();
+			comment.setComment(newComment);
+			// get the current time
+			comment.setCreateDate(new Date(System.currentTimeMillis()));
+			comment.setProjectId(projectId);
+			comment.setUserId(userId);
 
-		// TODO implement this
-		// this.dbInterface.addCommentForProject(id, commentObj);
-
-		return "Project.jsf?id=" + getProjectId();
+			// make sure that no matter what happens we will get redirected to the same page
+			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
+			
+			// try to create the new comment and if it fails show a message
+			if (dbInterface.createComment(comment) == null) {
+				throw new Exception("Failed to create a new comment. Please try it again!");
+			}
+		} catch (Exception e) {
+			FacesContextUtils.showMessage(e.getMessage());
+		}
+		
+		return null;
 	}
 
 	public List<Comment> getComments() {
-		// TODO implement this
-		// List<Comment> comments = this.dbInterface.getCommentsOfProject(id);
-		// Create a table to display the comments the same way as above
-		// session.setAttribute("commentTable", table);
-
-		return new ArrayList<Comment>();
+		return comments;
 	}
 
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
 	}
 
 	public int getProjectId() {
@@ -113,5 +121,13 @@ public class ProjectController implements Serializable {
 
 	public void setSessionData(SessionData sessionData) {
 		this.sessionData = sessionData;
+	}
+
+	public String getNewComment() {
+		return newComment;
+	}
+
+	public void setNewComment(String newComment) {
+		this.newComment = newComment;
 	}
 }
