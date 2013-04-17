@@ -1,5 +1,6 @@
 package ch.ethz.inf.dbproject.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -8,7 +9,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,6 +110,13 @@ public final class DatastoreInterface {
 	private static final String SELECT_SOON_ENDING_PROJECTS_PREP = "SELECT * FROM project WHERE end_date BETWEEN ? "
 			+ "AND ? ORDER BY end_date";
 	private PreparedStatement selectSoonEndingProjects;
+	
+	private static final int MOST_FUNDED_PROJECT_COUNT = 10;
+	private static final String SELECT_MOST_FUNDED_PROJECTS = "SELECT project_id, SUM(amount) "
+			+ "FROM funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id "
+			+ "GROUP BY project_id "
+			+ "ORDER BY SUM(amount) DESC "
+			+ "LIMIT " + MOST_FUNDED_PROJECT_COUNT;
 
 	private Connection sqlConnection = null;
 
@@ -546,6 +556,24 @@ public final class DatastoreInterface {
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve the soon ending Projects!", e);
+		}
+		
+		return res;
+	}
+	
+	public List<Project> getMostFundedProjects() {
+		List<Project> res = new ArrayList<>();
+		
+		try(Statement stmt = sqlConnection.createStatement();
+				ResultSet rs = stmt.executeQuery(SELECT_MOST_FUNDED_PROJECTS)) {
+			while(rs.next()) {
+				Project p = getProjectById(rs.getInt(1)); 
+				p.setTotalAmount(rs.getBigDecimal(2));
+				
+				res.add(p);
+			}
+		} catch(SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!");
 		}
 		
 		return res;

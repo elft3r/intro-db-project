@@ -28,6 +28,9 @@ public final class Project implements Serializable {
 	private int ownerId;
 	private User user;
 	private BigDecimal goal;
+	
+	// TODO This is ugly, but we just do it this way
+	private BigDecimal totalAmount;
 
 	public Project() {
 
@@ -138,6 +141,14 @@ public final class Project implements Serializable {
 
 	public void setGoal(BigDecimal goal) {
 		this.goal = goal;
+	}
+
+	public BigDecimal getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(BigDecimal totalAmount) {
+		this.totalAmount = totalAmount;
 	}
 
 	private void initDbInterface() {
