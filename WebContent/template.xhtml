@@ -54,10 +54,9 @@
 					<div class="menuDiv2"><a href="Projects.jsf?filter=funded">Most funded</a></div>
 					<div class="menuDiv2"><a href="Projects.jsf?filter=ending">Ending soon</a></div>
 					<div class="menuDiv1">Categories</div>
-					<div class="menuDiv2"><a href="Projects.jsf?category=art">Art</a></div>
-					<div class="menuDiv2"><a href="Projects.jsf?category=comics">Comics</a></div>
-					<div class="menuDiv2"><a href="Projects.jsf?category=music">Music</a></div>
-					<div class="menuDiv2"><a href="Projects.jsf?category=other">...</a></div>
+					<ui:repeat value="#{homeController.allCategories}" var="item">
+						<div class="menuDiv2"><a href="Projects.jsf?category=#{item.name}">#{item.name}</a></div>
+					</ui:repeat>
 					<div class="menuDiv1"><a href="Search.jsf">Search</a></div>
 					<div class="menuDiv1"><a href="User.jsf">User Profile</a></div>
 					<h:panelGroup rendered="#{sessionData.user != null}">
