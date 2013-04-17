@@ -112,8 +112,8 @@ public final class DatastoreInterface {
 	private PreparedStatement selectSoonEndingProjects;
 	
 	private static final int MOST_FUNDED_PROJECT_COUNT = 10;
-	private static final String SELECT_MOST_FUNDED_PROJECTS = "SELECT project_id, SUM(amount) "
-			+ "FROM funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id "
+	private static final String SELECT_MOST_FUNDED_PROJECTS = "SELECT p.*, SUM(amount) AS total_amount "
+			+ "FROM project p INNER JOIN (funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id) ON p.id = fa.project_id "
 			+ "GROUP BY project_id "
 			+ "ORDER BY SUM(amount) DESC "
 			+ "LIMIT " + MOST_FUNDED_PROJECT_COUNT;
@@ -567,8 +567,8 @@ public final class DatastoreInterface {
 		try(Statement stmt = sqlConnection.createStatement();
 				ResultSet rs = stmt.executeQuery(SELECT_MOST_FUNDED_PROJECTS)) {
 			while(rs.next()) {
-				Project p = getProjectById(rs.getInt(1)); 
-				p.setTotalAmount(rs.getBigDecimal(2));
+				Project p = new Project(rs); 
+				p.setTotalAmount(rs.getBigDecimal("total_amount"));
 				
 				res.add(p);
 			}
