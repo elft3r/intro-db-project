@@ -38,10 +38,10 @@ public final class DatastoreInterface {
 			+ "where p.title like ?";
 	private PreparedStatement projectsByName;
 
-	private static final String SELECT_PROJECTS_BY_CATEGORY_PREP = "select p.id, p.title, p.description, p.goal, "
-			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
-			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
-			+ "where cat.name like ?";
+	private static final String SELECT_PROJECTS_BY_CATEGORY_PREP = "SELECT p.id, p.title, p.description, p.goal, "
+			+ "p.start_date, p.end_date, p.category_id, p.city_id, p.owner_id, c.name AS city, cat.name AS category "
+			+ "FROM project p INNER JOIN city c ON p.city_id = c.id INNER JOIN category cat ON p.category_id = cat.id "
+			+ "WHERE cat.name LIKE ?";
 	private PreparedStatement projectsByCategory;
 
 	private static final String SELECT_PROJECTS_BY_CITY_PREP = "select p.id, p.title, p.description, p.goal, "
@@ -97,10 +97,30 @@ public final class DatastoreInterface {
 			+ "WHERE c.project_id = ? "
 			+ "ORDER BY c.id ASC";
 	private PreparedStatement commentsByProjectId;
-	
-	private static final String INSERT_COMMENT_PREP = "INSERT INTO comment(text, create_date, user_id, project_id)" +
-			"VALUES(?, ?, ?, ?)";
+
+	private static final String INSERT_COMMENT_PREP = "INSERT INTO comment(text, create_date, user_id, project_id)"
+			+ "VALUES(?, ?, ?, ?)";
 	private PreparedStatement insertComment;
+
+	/** Specify the days we want to show */
+	private static final int DAYS_TILL_ENDING = 10;
+	private static final String SELECT_SOON_ENDING_PROJECTS_PREP = "SELECT * FROM project WHERE end_date BETWEEN ? "
+			+ "AND ? ORDER BY end_date";
+	private PreparedStatement selectSoonEndingProjects;
+
+	private static final int MOST_FUNDED_PROJECT_COUNT = 10;
+	private static final String SELECT_MOST_FUNDED_PROJECTS = "SELECT p.*, SUM(amount) AS total_amount "
+			+ "FROM project p INNER JOIN (funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id) ON p.id = fa.project_id "
+			+ "GROUP BY project_id "
+			+ "ORDER BY SUM(amount) DESC "
+			+ "LIMIT " + MOST_FUNDED_PROJECT_COUNT;
+
+	private static final int MOST_POPULAR_PROJECTS_COUNT = 10;
+	private static final String SELECT_MOST_POPULAR_PROJECTS = "SELECT p.*, COUNT(DISTINCT user_id) AS user_count "
+			+ "FROM project p INNER JOIN (funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id) ON p.id = fa.project_id "
+			+ "GROUP BY project_id "
+			+ "ORDER BY COUNT(DISTINCT user_id) DESC "
+			+ "LIMIT " + MOST_POPULAR_PROJECTS_COUNT;
 
 	private Connection sqlConnection = null;
 
@@ -134,6 +154,7 @@ public final class DatastoreInterface {
 			this.commentsByProjectId = sqlConnection.prepareStatement(SELECT_COMMENTS_BY_PROJECT_ID);
 			this.insertComment = sqlConnection.prepareStatement(INSERT_COMMENT_PREP,
 					PreparedStatement.RETURN_GENERATED_KEYS);
+			this.selectSoonEndingProjects = sqlConnection.prepareStatement(SELECT_SOON_ENDING_PROJECTS_PREP);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -475,13 +496,13 @@ public final class DatastoreInterface {
 
 		return res;
 	}
-	
+
 	public List<Comment> getCommentsByProjectId(int id) {
 		List<Comment> res = new ArrayList<>();
-		
+
 		try {
 			commentsByProjectId.setInt(1, id);
-			
+
 			try (ResultSet rs = commentsByProjectId.executeQuery()) {
 				while (rs.next()) {
 					res.add(new Comment(rs));
@@ -490,24 +511,24 @@ public final class DatastoreInterface {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve comments for project with id=\"" + id + "\"!", e);
 		}
-		
+
 		return res;
 	}
-	
+
 	public Comment createComment(Comment comment) {
 		Comment res = null;
-		
+
 		try {
 			insertComment.setString(1, comment.getComment());
 			insertComment.setTimestamp(2, new Timestamp(comment.getCreateDate().getTime()));
 			insertComment.setInt(3, comment.getUserId());
 			insertComment.setInt(4, comment.getProjectId());
-			
-			if(insertComment.executeUpdate() == 0) {
+
+			if (insertComment.executeUpdate() == 0) {
 				throw new SQLException("ExecuteUpdate returned 0!");
 			}
-			
-			try(ResultSet rs = insertComment.getGeneratedKeys()) {
+
+			try (ResultSet rs = insertComment.getGeneratedKeys()) {
 				if (rs.next()) {
 					comment.setId(rs.getInt(1));
 					// When we are here this means that the comment was successfully created and
@@ -516,11 +537,66 @@ public final class DatastoreInterface {
 					res = comment;
 				}
 			}
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create new comment for project with id=\"" + comment.getProjectId()
 					+ "\"!", e);
 		}
-		
+
+		return res;
+	}
+
+	public List<Project> getSoonEndingProjects() {
+		List<Project> res = new ArrayList<>();
+
+		try {
+			long diff = DAYS_TILL_ENDING * 24 * 60 * 60 * 1000;
+			selectSoonEndingProjects.setDate(1, new Date(System.currentTimeMillis()));
+			selectSoonEndingProjects.setDate(2, new Date(System.currentTimeMillis() + diff));
+
+			try (ResultSet rs = selectSoonEndingProjects.executeQuery()) {
+				while (rs.next()) {
+					res.add(new Project(rs));
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the soon ending Projects!", e);
+		}
+
+		return res;
+	}
+
+	public List<Project> getMostFundedProjects() {
+		List<Project> res = new ArrayList<>();
+
+		try (Statement stmt = sqlConnection.createStatement();
+				ResultSet rs = stmt.executeQuery(SELECT_MOST_FUNDED_PROJECTS)) {
+			while (rs.next()) {
+				Project p = new Project(rs);
+				p.setTotalAmount(rs.getBigDecimal("total_amount"));
+
+				res.add(p);
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
+		}
+
+		return res;
+	}
+
+	public List<Project> getMostPopularProjects() {
+		List<Project> res = new ArrayList<>();
+
+		try (Statement stmt = sqlConnection.createStatement();
+				ResultSet rs = stmt.executeQuery(SELECT_MOST_POPULAR_PROJECTS)) {
+			while (rs.next()) {
+				Project p = new Project(rs);
+				p.setUserCount(rs.getInt("user_count"));
+				res.add(p);
+
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
+		}
 		return res;
 	}
 }

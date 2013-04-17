@@ -24,6 +24,29 @@
 				        </f:facet>
 				        <a href="Project.jsf?id=#{project.id}">View Project</a>
 				    </h:column>
+				    <!-- For soon ending projects we show the remaining days -->
+				    <h:column rendered="#{projectsController.filter eq 'ending'}">
+				        <f:facet name="header">
+				            <h:outputText value="Remaining Days" />
+				        </f:facet>
+						<h:outputText value="#{project.remainingFundingTime}"/>
+				    </h:column>
+				    
+				    <!-- For the most funded projects we show the total amount -->
+				    <h:column rendered="#{projectsController.filter eq 'funded'}">
+				    	<f:facet name="header">
+				    		<h:outputText value="Total funding amount" />
+				    	</f:facet>
+				    	<h:outputText value="#{project.totalAmount}" />
+				    </h:column>
+				    
+				    <!-- For the most popular projects we show the nr of users who funded the project -->
+				    <h:column rendered="#{projectsController.filter eq 'popular'}">
+				    	<f:facet name="header">
+				    		<h:outputText value="Nr. of funding users" />
+				    	</f:facet>
+				    	<h:outputText value="#{project.userCount}" />
+				    </h:column>
 				</h:dataTable>
 				<hr/>
     		</ui:define>

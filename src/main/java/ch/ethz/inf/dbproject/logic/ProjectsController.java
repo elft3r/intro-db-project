@@ -22,39 +22,25 @@ public class ProjectsController {
 	@ManagedProperty(value="#{param.category}") // read from request parameter
 	private String category;
 	
-	public List<Project> getProjects(){
+	public List<Project> getProjects() {
 		if (filter == null && category == null) {
 			// If no filter is specified, then we display all the projects!
 			return dbInterface.getAllProjects();
 
 		} else if (category != null) {
-
-			// TODO implement this!
-			//return dbInterface.getProjectsByCategory(category);
-			
+			return dbInterface.getProjectsByCategory(category);
 		} else if (filter != null) {
-		
-			if(filter.equals("popular")) {
-
-				// TODO implement this!
-				//return dbInterface.getMostPopularProjects();
-
+			if (filter.equals("popular")) {
+				 return dbInterface.getMostPopularProjects();
 			} else if (filter.equals("funded")) {
-
-				// TODO implement this!
-				// return dbInterface.getMostFundedProjects();
-
+				 return dbInterface.getMostFundedProjects();
 			} else if (filter.equals("ending")) {
-
-				// TODO implement this!
-				// return dbInterface.getSoonEndingProjects();
-
+				return dbInterface.getSoonEndingProjects();
 			}
-			
 		} else {
 			throw new RuntimeException("Code should not be reachable!");
 		}
-		
+
 		return null;
 	}
 
