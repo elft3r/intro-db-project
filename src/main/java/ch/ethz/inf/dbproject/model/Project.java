@@ -2,6 +2,7 @@ package ch.ethz.inf.dbproject.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -172,13 +173,29 @@ public final class Project implements Serializable {
 	
 	public String getRemainingFundingTime() {
 		String res = "Project is closed for funding!";
-		
-		long diff = endDate.getTime() - System.currentTimeMillis();
+
+		long endDateMillis = getTimeForEndOfDay(endDate.getTime());
+		long endOfToday = getTimeForEndOfDay(System.currentTimeMillis());
+
+		long diff = endDateMillis - endOfToday;
 		long diffDays = diff / (24 * 60 * 60 * 1000);
-		if(diffDays > 0) {
+		if (diffDays > 0) {
 			res = diffDays + " days remaining!";
+		} else if (diffDays == 0) {
+			res = "Project will be closed tonight!";
 		}
-		
+
 		return res;
+	}
+
+	private long getTimeForEndOfDay(long timeInMillis) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timeInMillis);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+
+		return cal.getTimeInMillis();
 	}
 }
