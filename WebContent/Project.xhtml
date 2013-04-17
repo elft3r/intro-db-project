@@ -85,7 +85,34 @@
 				        </h:form>
 				    </h:column>
 				</h:dataTable>
-				<br/>
+				
+				<!-- Allow the owner of the project to add new funding amounts -->
+				<h:form rendered="#{sessionData.user != null and sessionData.user.id eq projectController.selectedProject.ownerId}">
+					<br />
+					<h3>Add Funding Amount</h3>
+					<table>
+						<tr>
+							<th>Amount</th>
+							<td>
+								<h:inputText value="#{projectController.newFundingAmount}">
+									<f:convertNumber type="currency" />
+								</h:inputText>
+							</td>
+						</tr>
+						<tr>
+							<th>Reward</th>
+							<td><h:inputTextarea cols="30" rows="2" value="#{projectController.newReward}"/></td>
+						</tr>
+						<tr>
+							<td>
+								<h:commandButton value="Add" action="#{projectController.addFundingAmount}" />
+							</td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
+				</h:form>
+				
+				<br />
 				 
 				<!-- Display comments -->
 				<h2>Comments</h2>

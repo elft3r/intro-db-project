@@ -137,6 +137,10 @@ public final class Project implements Serializable {
 	public void setOwnerId(int id) {
 		this.ownerId = id;
 	}
+	
+	public int getOwnerId() {
+		return this.ownerId;
+	}
 
 	public BigDecimal getGoal() {
 		return goal;

@@ -121,6 +121,10 @@ public final class DatastoreInterface {
 			+ "GROUP BY project_id "
 			+ "ORDER BY COUNT(DISTINCT user_id) DESC "
 			+ "LIMIT " + MOST_POPULAR_PROJECTS_COUNT;
+	
+	private static final String INSERT_FUNDING_AMOUNT_PREP = "INSERT INTO funding_amount(amount, reward, project_id) "
+			+ "VALUES(?, ?, ?)";
+	private PreparedStatement insertFundingAmount;
 
 	private Connection sqlConnection = null;
 
@@ -155,6 +159,8 @@ public final class DatastoreInterface {
 			this.insertComment = sqlConnection.prepareStatement(INSERT_COMMENT_PREP,
 					PreparedStatement.RETURN_GENERATED_KEYS);
 			this.selectSoonEndingProjects = sqlConnection.prepareStatement(SELECT_SOON_ENDING_PROJECTS_PREP);
+			this.insertFundingAmount = sqlConnection.prepareStatement(INSERT_FUNDING_AMOUNT_PREP,
+					PreparedStatement.RETURN_GENERATED_KEYS);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -597,6 +603,36 @@ public final class DatastoreInterface {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
 		}
+		return res;
+	}
+
+	public FundingAmount createFundingAmount(FundingAmount fa) {
+		FundingAmount res = null;
+
+		try {
+			// fill the gaps in the statement
+			insertFundingAmount.setBigDecimal(1, fa.getAmount());
+			insertFundingAmount.setString(2, fa.getReward());
+			insertFundingAmount.setInt(3, fa.getProjectId());
+
+			if (insertFundingAmount.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+
+			// now retrieve the generated key
+			try (ResultSet rs = insertFundingAmount.getGeneratedKeys()) {
+				if (rs.next()) {
+					// first check that we really have the ID and then set it as a return value
+					fa.setId(rs.getInt(1));
+
+					res = fa;
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING,
+					"Failed to create a new funding amount for project with id=\"" + fa.getProjectId() + "\"!", e);
+		}
+
 		return res;
 	}
 }

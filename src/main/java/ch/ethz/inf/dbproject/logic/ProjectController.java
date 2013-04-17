@@ -1,6 +1,7 @@
 package ch.ethz.inf.dbproject.logic;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -31,12 +32,15 @@ public class ProjectController implements Serializable {
 	private static final long serialVersionUID = -6272753030255122907L;
 
 	private DatastoreInterface dbInterface = new DatastoreInterface();
-	
+
 	private String newComment;
 	private List<Comment> comments;
 	private int projectId;
 	private Project selectedProject;
 	private List<FundingAmount> fundingAmounts;
+
+	private BigDecimal newFundingAmount;
+	private String newReward;
 
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;
@@ -85,17 +89,37 @@ public class ProjectController implements Serializable {
 			comment.setProjectId(projectId);
 			comment.setUserId(userId);
 
-			// make sure that no matter what happens we will get redirected to the same page
-			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
-			
 			// try to create the new comment and if it fails show a message
 			if (dbInterface.createComment(comment) == null) {
 				throw new Exception("Failed to create a new comment. Please try it again!");
 			}
+			
+			// make sure that when we created the comment successfully we reload the page
+			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
 		} catch (Exception e) {
 			FacesContextUtils.showMessage(e.getMessage());
 		}
-		
+
+		return null;
+	}
+
+	public String addFundingAmount() {
+		try {
+			FundingAmount fa = new FundingAmount();
+			fa.setAmount(newFundingAmount);
+			fa.setProjectId(projectId);
+			fa.setReward(newReward);
+			
+			if(dbInterface.createFundingAmount(fa) == null) {
+				throw new Exception("Failed to create the new funding amount. Please try it again!");
+			}
+			
+			// make sure that when we created the new funding amount successfully we reload the page
+			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
+		} catch (Exception e) {
+			FacesContextUtils.showMessage(e.getMessage());
+		}
+
 		return null;
 	}
 
@@ -129,5 +153,21 @@ public class ProjectController implements Serializable {
 
 	public void setNewComment(String newComment) {
 		this.newComment = newComment;
+	}
+
+	public BigDecimal getNewFundingAmount() {
+		return newFundingAmount;
+	}
+
+	public void setNewFundingAmount(BigDecimal newFundingAmount) {
+		this.newFundingAmount = newFundingAmount;
+	}
+
+	public String getNewReward() {
+		return newReward;
+	}
+
+	public void setNewReward(String newReward) {
+		this.newReward = newReward;
 	}
 }
