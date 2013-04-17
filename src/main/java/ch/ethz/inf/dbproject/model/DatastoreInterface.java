@@ -97,17 +97,17 @@ public final class DatastoreInterface {
 			+ "WHERE c.project_id = ? "
 			+ "ORDER BY c.id ASC";
 	private PreparedStatement commentsByProjectId;
-	
-	private static final String INSERT_COMMENT_PREP = "INSERT INTO comment(text, create_date, user_id, project_id)" +
-			"VALUES(?, ?, ?, ?)";
+
+	private static final String INSERT_COMMENT_PREP = "INSERT INTO comment(text, create_date, user_id, project_id)"
+			+ "VALUES(?, ?, ?, ?)";
 	private PreparedStatement insertComment;
-	
+
 	/** Specify the days we want to show */
 	private static final int DAYS_TILL_ENDING = 10;
 	private static final String SELECT_SOON_ENDING_PROJECTS_PREP = "SELECT * FROM project WHERE end_date BETWEEN ? "
 			+ "AND ? ORDER BY end_date";
 	private PreparedStatement selectSoonEndingProjects;
-	
+
 	private static final int MOST_FUNDED_PROJECT_COUNT = 10;
 	private static final String SELECT_MOST_FUNDED_PROJECTS = "SELECT p.*, SUM(amount) AS total_amount "
 			+ "FROM project p INNER JOIN (funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id) ON p.id = fa.project_id "
@@ -496,13 +496,13 @@ public final class DatastoreInterface {
 
 		return res;
 	}
-	
+
 	public List<Comment> getCommentsByProjectId(int id) {
 		List<Comment> res = new ArrayList<>();
-		
+
 		try {
 			commentsByProjectId.setInt(1, id);
-			
+
 			try (ResultSet rs = commentsByProjectId.executeQuery()) {
 				while (rs.next()) {
 					res.add(new Comment(rs));
@@ -511,24 +511,24 @@ public final class DatastoreInterface {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve comments for project with id=\"" + id + "\"!", e);
 		}
-		
+
 		return res;
 	}
-	
+
 	public Comment createComment(Comment comment) {
 		Comment res = null;
-		
+
 		try {
 			insertComment.setString(1, comment.getComment());
 			insertComment.setTimestamp(2, new Timestamp(comment.getCreateDate().getTime()));
 			insertComment.setInt(3, comment.getUserId());
 			insertComment.setInt(4, comment.getProjectId());
-			
-			if(insertComment.executeUpdate() == 0) {
+
+			if (insertComment.executeUpdate() == 0) {
 				throw new SQLException("ExecuteUpdate returned 0!");
 			}
-			
-			try(ResultSet rs = insertComment.getGeneratedKeys()) {
+
+			try (ResultSet rs = insertComment.getGeneratedKeys()) {
 				if (rs.next()) {
 					comment.setId(rs.getInt(1));
 					// When we are here this means that the comment was successfully created and
@@ -537,49 +537,49 @@ public final class DatastoreInterface {
 					res = comment;
 				}
 			}
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create new comment for project with id=\"" + comment.getProjectId()
 					+ "\"!", e);
 		}
-		
+
 		return res;
 	}
-	
+
 	public List<Project> getSoonEndingProjects() {
 		List<Project> res = new ArrayList<>();
-		
+
 		try {
 			long diff = DAYS_TILL_ENDING * 24 * 60 * 60 * 1000;
 			selectSoonEndingProjects.setDate(1, new Date(System.currentTimeMillis()));
 			selectSoonEndingProjects.setDate(2, new Date(System.currentTimeMillis() + diff));
-			
-			try(ResultSet rs = selectSoonEndingProjects.executeQuery()) {
-				while(rs.next()) {
+
+			try (ResultSet rs = selectSoonEndingProjects.executeQuery()) {
+				while (rs.next()) {
 					res.add(new Project(rs));
 				}
 			}
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve the soon ending Projects!", e);
 		}
-		
+
 		return res;
 	}
-	
+
 	public List<Project> getMostFundedProjects() {
 		List<Project> res = new ArrayList<>();
-		
-		try(Statement stmt = sqlConnection.createStatement();
+
+		try (Statement stmt = sqlConnection.createStatement();
 				ResultSet rs = stmt.executeQuery(SELECT_MOST_FUNDED_PROJECTS)) {
-			while(rs.next()) {
-				Project p = new Project(rs); 
+			while (rs.next()) {
+				Project p = new Project(rs);
 				p.setTotalAmount(rs.getBigDecimal("total_amount"));
-				
+
 				res.add(p);
 			}
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
 		}
-		
+
 		return res;
 	}
 
