@@ -9,7 +9,18 @@
     	<ui:composition template="template.xhtml">
  
     		<ui:define name="content">
-				<h1>Projects</h1>
+    			<ui:fragment rendered="#{projectsController.filter eq 'ending'}">
+	    			<h1> Soon ending Projects</h1>
+    			</ui:fragment>
+    			<ui:fragment rendered="#{projectsController.filter eq 'funded'}">
+	    			<h1> Most funded Projects</h1>
+    			</ui:fragment>
+    			<ui:fragment rendered="#{projectsController.filter eq 'popular'}">
+	    			<h1> Most popular Projects</h1>
+    			</ui:fragment>
+    			<ui:fragment rendered="#{projectsController.filter ne 'ending' and projectsController.filter ne 'funded' and projectsController.filter ne 'popular'}">
+					<h1>All Projects</h1>
+    			</ui:fragment>
 				<hr/>
 				<h:dataTable value="#{projectsController.projects}" var="project" styleClass="projectsTable">
 				    <h:column>
