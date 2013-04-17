@@ -16,6 +16,7 @@ import ch.ethz.inf.dbproject.model.Comment;
 import ch.ethz.inf.dbproject.model.DatastoreInterface;
 import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.Project;
+import ch.ethz.inf.dbproject.model.StretchedGoals;
 import ch.ethz.inf.utils.FacesContextUtils;
 import ch.ethz.inf.utils.StringUtils;
 
@@ -38,9 +39,13 @@ public class ProjectController implements Serializable {
 	private int projectId;
 	private Project selectedProject;
 	private List<FundingAmount> fundingAmounts;
+	private List<StretchedGoals> stretchedGoals;
 
 	private BigDecimal newFundingAmount;
 	private String newReward;
+	
+	private BigDecimal newGoal;
+	private String newBonus;
 
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;
@@ -53,9 +58,11 @@ public class ProjectController implements Serializable {
 			projectId = Integer.valueOf(id);
 		}
 
+		//TODO do we want to have this in one SQL query?
 		selectedProject = dbInterface.getProjectById(getProjectId());
 		fundingAmounts = dbInterface.getAmountsOfProject(projectId);
 		comments = dbInterface.getCommentsByProjectId(projectId);
+		setStretchedGoals(dbInterface.getStretchedGoals(projectId));
 	}
 
 	public Project getSelectedProject() {
@@ -122,6 +129,26 @@ public class ProjectController implements Serializable {
 
 		return null;
 	}
+	
+	public String addStretchedGoal() {
+		try {
+			StretchedGoals sg = new StretchedGoals();
+			sg.setBonus(newBonus);
+			sg.setGoal(newGoal);
+			sg.setProjectId(projectId);
+
+			if (dbInterface.createStretchedGoal(sg) == null) {
+				throw new Exception("Failed to create the new stretched goal. Please try again!");
+			}
+
+			// make sure that when we created the new stretched goal successfully we reload the page
+			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
+		} catch (Exception e) {
+			FacesContextUtils.showMessage(e.getMessage());
+		}
+
+		return null;
+	}
 
 	public List<Comment> getComments() {
 		return comments;
@@ -169,5 +196,29 @@ public class ProjectController implements Serializable {
 
 	public void setNewReward(String newReward) {
 		this.newReward = newReward;
+	}
+
+	public List<StretchedGoals> getStretchedGoals() {
+		return stretchedGoals;
+	}
+
+	public void setStretchedGoals(List<StretchedGoals> stretchedGoals) {
+		this.stretchedGoals = stretchedGoals;
+	}
+
+	public BigDecimal getNewGoal() {
+		return newGoal;
+	}
+
+	public void setNewGoal(BigDecimal newGoal) {
+		this.newGoal = newGoal;
+	}
+
+	public String getNewBonus() {
+		return newBonus;
+	}
+
+	public void setNewBonus(String newBonus) {
+		this.newBonus = newBonus;
 	}
 }
