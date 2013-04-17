@@ -85,7 +85,80 @@
 				        </h:form>
 				    </h:column>
 				</h:dataTable>
-				<br/>
+				
+				<!-- Allow the owner of the project to add new funding amounts -->
+				<h:form rendered="#{sessionData.user != null and sessionData.user.id eq projectController.selectedProject.ownerId}">
+					<br />
+					<h3>Add Funding Amount</h3>
+					<table>
+						<tr>
+							<th>Amount</th>
+							<td>
+								<h:inputText value="#{projectController.newFundingAmount}">
+									<f:convertNumber type="currency" />
+								</h:inputText>
+							</td>
+						</tr>
+						<tr>
+							<th>Reward</th>
+							<td><h:inputTextarea cols="30" rows="2" value="#{projectController.newReward}"/></td>
+						</tr>
+						<tr>
+							<td>
+								<h:commandButton value="Add" action="#{projectController.addFundingAmount}" />
+							</td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
+				</h:form>
+				
+				<br />
+				
+				<!-- Display streched goals -->
+				<h2>Stretched Goals</h2>
+				<h:dataTable value="#{projectController.stretchedGoals}" var="goal" styleClass="projectsTable"
+							 cellpadding="0" cellspacing="0" rendered="#{not empty projectController.stretchedGoals}">
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Goal" />
+				        </f:facet>
+				        <h:outputText value="#{goal.goal}" />
+				    </h:column>
+				    <h:column>
+				        <f:facet name="header">
+				            <h:outputText value="Bonus" />
+				        </f:facet>
+				        <h:outputText value="#{goal.bonus}" />
+				    </h:column>
+				</h:dataTable>
+				
+				<!-- Allow the owner of the project to add new funding amounts -->
+				<h:form rendered="#{sessionData.user != null and sessionData.user.id eq projectController.selectedProject.ownerId}">
+					<br />
+					<h3>Add Stretched Goal</h3>
+					<table>
+						<tr>
+							<th>Goal</th>
+							<td>
+								<h:inputText value="#{projectController.newGoal}">
+									<f:convertNumber type="currency" />
+								</h:inputText>
+							</td>
+						</tr>
+						<tr>
+							<th>Bonus</th>
+							<td><h:inputTextarea cols="30" rows="2" value="#{projectController.newBonus}"/></td>
+						</tr>
+						<tr>
+							<td>
+								<h:commandButton value="Add" action="#{projectController.addStretchedGoal}" />
+							</td>
+							<td>&nbsp;</td>
+						</tr>
+					</table>
+				</h:form>
+				
+				<br />
 				 
 				<!-- Display comments -->
 				<h2>Comments</h2>

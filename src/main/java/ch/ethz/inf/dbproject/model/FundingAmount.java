@@ -10,7 +10,8 @@ public class FundingAmount implements Serializable {
 	private int id;
 	private BigDecimal amount;
 	private String reward;
-	private Project Project;
+	private Project project;
+	private int projectId;
 
 	public BigDecimal getAmount() {
 		return amount;
@@ -29,11 +30,11 @@ public class FundingAmount implements Serializable {
 	}
 
 	public Project getProject() {
-		return Project;
+		return project;
 	}
 
 	public void setProject(Project project) {
-		Project = project;
+		this.project = project;
 	}
 
 	public int getId() {
@@ -42,5 +43,13 @@ public class FundingAmount implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(int projectId) {
+		this.projectId = projectId;
 	}
 }
