@@ -3,9 +3,26 @@ Sandro:
 * search projects [check]
 * fund project [check]
 * User view [check]
+* Show whether goals and stretched goals are achieved
+* Funding progress
 
 Jochen:
-* Create Project
-* Project detailed view
-* View popular, .... projects
-* Category views
+* Create Project [check]
+* Project detailed view [check]
+* View popular, .... projects [check]
+* Category views [check]
+* Heroku
+
+----------
+NICE TO HAVE
+
+* Create a bit more sample data
+
+* Disable support button when already funded by the user
+* Disable support button when funding period is over
+* Disable support button when funding period hasn't started yet
+
+* Calculate total amount on user page
+* Show created projects on user page
+
+* Images and Videos
