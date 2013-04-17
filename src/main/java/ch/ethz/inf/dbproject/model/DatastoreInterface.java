@@ -121,6 +121,18 @@ public final class DatastoreInterface {
 			+ "GROUP BY project_id "
 			+ "ORDER BY COUNT(DISTINCT user_id) DESC "
 			+ "LIMIT " + MOST_POPULAR_PROJECTS_COUNT;
+	
+	private static final String INSERT_FUNDING_AMOUNT_PREP = "INSERT INTO funding_amount(amount, reward, project_id) "
+			+ "VALUES(?, ?, ?)";
+	private PreparedStatement insertFundingAmount;
+
+	private static final String SELECT_STRETCHED_GOALS_PREP = "SELECT * FROM stretched_goal WHERE project_id = ? "
+			+ "ORDER BY goal";
+	private PreparedStatement selectStretchedGoals;
+
+	private static final String INSERT_STRETCHED_GOAL_PREP = "INSERT INTO stretched_goal(goal, bonus, project_id) "
+			+ "VALUES(?, ?, ?)";
+	private PreparedStatement insertStretchedGoal;
 
 	private Connection sqlConnection = null;
 
@@ -155,6 +167,11 @@ public final class DatastoreInterface {
 			this.insertComment = sqlConnection.prepareStatement(INSERT_COMMENT_PREP,
 					PreparedStatement.RETURN_GENERATED_KEYS);
 			this.selectSoonEndingProjects = sqlConnection.prepareStatement(SELECT_SOON_ENDING_PROJECTS_PREP);
+			this.insertFundingAmount = sqlConnection.prepareStatement(INSERT_FUNDING_AMOUNT_PREP,
+					PreparedStatement.RETURN_GENERATED_KEYS);
+			this.selectStretchedGoals = sqlConnection.prepareStatement(SELECT_STRETCHED_GOALS_PREP);
+			this.insertStretchedGoal = sqlConnection.prepareStatement(INSERT_STRETCHED_GOAL_PREP,
+					PreparedStatement.RETURN_GENERATED_KEYS);
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to create prepared statements", e);
 		}
@@ -597,6 +614,84 @@ public final class DatastoreInterface {
 		} catch (SQLException e) {
 			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
 		}
+		return res;
+	}
+
+	public FundingAmount createFundingAmount(FundingAmount fa) {
+		FundingAmount res = null;
+
+		try {
+			// fill the gaps in the statement
+			insertFundingAmount.setBigDecimal(1, fa.getAmount());
+			insertFundingAmount.setString(2, fa.getReward());
+			insertFundingAmount.setInt(3, fa.getProjectId());
+
+			if (insertFundingAmount.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+
+			// now retrieve the generated key
+			try (ResultSet rs = insertFundingAmount.getGeneratedKeys()) {
+				if (rs.next()) {
+					// first check that we really have the ID and then set it as a return value
+					fa.setId(rs.getInt(1));
+
+					res = fa;
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING,
+					"Failed to create a new funding amount for project with id=\"" + fa.getProjectId() + "\"!", e);
+		}
+
+		return res;
+	}
+
+	public StretchedGoals createStretchedGoal(StretchedGoals sg) {
+		StretchedGoals res = null;
+
+		try {
+			// fill the gaps in the statement
+			insertStretchedGoal.setBigDecimal(1, sg.getGoal());
+			insertStretchedGoal.setString(2, sg.getBonus());
+			insertStretchedGoal.setInt(3, sg.getProjectId());
+
+			if (insertStretchedGoal.executeUpdate() == 0) {
+				throw new SQLException("ExecuteUpdate returned 0!");
+			}
+
+			// now retrieve teh generated key
+			try (ResultSet rs = insertStretchedGoal.getGeneratedKeys()) {
+				if (rs.next()) {
+					// first try to get the generated ID and then make sure that the updated object
+					// will be returned
+					sg.setId(rs.getInt(1));
+
+					res = sg;
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING,
+					"Failed to retrieve the stretched goals for project with id=\"" + sg.getProjectId() + "\"!", e);
+		}
+		return res;
+	}
+
+	public List<StretchedGoals> getStretchedGoals(int projectId) {
+		List<StretchedGoals> res = new ArrayList<>();
+
+		try {
+			selectStretchedGoals.setInt(1, projectId);
+			try (ResultSet rs = selectStretchedGoals.executeQuery()) {
+				while (rs.next()) {
+					res.add(new StretchedGoals(rs));
+				}
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the stretched goals for project with id=\"" + projectId
+					+ "\"!", e);
+		}
+
 		return res;
 	}
 }

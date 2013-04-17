@@ -45,7 +45,7 @@ CREATE TABLE funds (
 	FOREIGN KEY (fa_id) REFERENCES funding_amount(id)
 );
 
-CREATE TABLE streched_goal (
+CREATE TABLE stretched_goal (
 	id			INTEGER PRIMARY KEY AUTO_INCREMENT,
 	goal		DECIMAL(10,2) NOT NULL CHECK (goal >= 0.0),
 	bonus		TEXT NOT NULL,
