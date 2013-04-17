@@ -31,16 +31,12 @@ public class ProjectsController {
 			return dbInterface.getProjectsByCategory(category);
 		} else if (filter != null) {
 			if (filter.equals("popular")) {
-
-				// TODO implement this!
-				// return dbInterface.getMostPopularProjects();
-
+				 return dbInterface.getMostPopularProjects();
 			} else if (filter.equals("funded")) {
 				 return dbInterface.getMostFundedProjects();
 			} else if (filter.equals("ending")) {
 				return dbInterface.getSoonEndingProjects();
 			}
-
 		} else {
 			throw new RuntimeException("Code should not be reachable!");
 		}

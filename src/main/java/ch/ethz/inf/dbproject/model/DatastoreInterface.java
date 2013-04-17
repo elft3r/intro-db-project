@@ -1,6 +1,5 @@
 package ch.ethz.inf.dbproject.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -9,9 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,6 +114,13 @@ public final class DatastoreInterface {
 			+ "GROUP BY project_id "
 			+ "ORDER BY SUM(amount) DESC "
 			+ "LIMIT " + MOST_FUNDED_PROJECT_COUNT;
+
+	private static final int MOST_POPULAR_PROJECTS_COUNT = 10;
+	private static final String SELECT_MOST_POPULAR_PROJECTS = "SELECT p.*, COUNT(DISTINCT user_id) AS user_count "
+			+ "FROM project p INNER JOIN (funding_amount fa INNER JOIN funds f ON fa.id = f.fa_id) ON p.id = fa.project_id "
+			+ "GROUP BY project_id "
+			+ "ORDER BY COUNT(DISTINCT user_id) DESC "
+			+ "LIMIT " + MOST_POPULAR_PROJECTS_COUNT;
 
 	private Connection sqlConnection = null;
 
@@ -576,6 +580,23 @@ public final class DatastoreInterface {
 			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
 		}
 		
+		return res;
+	}
+
+	public List<Project> getMostPopularProjects() {
+		List<Project> res = new ArrayList<>();
+
+		try (Statement stmt = sqlConnection.createStatement();
+				ResultSet rs = stmt.executeQuery(SELECT_MOST_POPULAR_PROJECTS)) {
+			while (rs.next()) {
+				Project p = new Project(rs);
+				p.setUserCount(rs.getInt("user_count"));
+				res.add(p);
+
+			}
+		} catch (SQLException e) {
+			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
+		}
 		return res;
 	}
 }

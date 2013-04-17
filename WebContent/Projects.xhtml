@@ -39,6 +39,14 @@
 				    	</f:facet>
 				    	<h:outputText value="#{project.totalAmount}" />
 				    </h:column>
+				    
+				    <!-- For the most popular projects we show the nr of users who funded the project -->
+				    <h:column rendered="#{projectsController.filter eq 'popular'}">
+				    	<f:facet name="header">
+				    		<h:outputText value="Nr. of funding users" />
+				    	</f:facet>
+				    	<h:outputText value="#{project.userCount}" />
+				    </h:column>
 				</h:dataTable>
 				<hr/>
     		</ui:define>
