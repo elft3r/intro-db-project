@@ -32,10 +32,10 @@ public final class DatastoreInterface {
 
 	private static final String SELECT_ALL_PROJECTS = "SELECT * FROM project";
 
-	private static final String SELECT_PROJECTS_BY_NAME_PREP = "select p.id, p.title, p.description, p.goal, "
-			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
-			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
-			+ "where p.title like ?";
+	private static final String SELECT_PROJECTS_BY_NAME_PREP = "SELECT p.id, p.title, p.description, p.goal, "
+			+ "p.start_date, p.end_date, p.category_id, p.city_id, p.owner_id, c.name AS city, cat.name AS category "
+			+ "FROM project p INNER JOIN city c ON p.city_id = c.id INNER JOIN category cat ON p.category_id = cat.id "
+			+ "WHERE p.title like ?";
 	private PreparedStatement projectsByName;
 
 	private static final String SELECT_PROJECTS_BY_CATEGORY_PREP = "SELECT p.id, p.title, p.description, p.goal, "
@@ -45,14 +45,15 @@ public final class DatastoreInterface {
 	private PreparedStatement projectsByCategory;
 
 	private static final String SELECT_PROJECTS_BY_CITY_PREP = "select p.id, p.title, p.description, p.goal, "
-			+ "p.start_date, p.end_date, c.name as city, cat.name as category from project p "
-			+ "inner join city c on p.city_id = c.id inner join category cat on p.category_id = cat.id "
-			+ "where c.name like ?";
+			+ "p.start_date, p.end_date, p.category_id, p.city_id, p.owner_id, c.name AS city, cat.name AS category "
+			+ "FROM project p INNER JOIN city c ON p.city_id = c.id INNER JOIN category cat ON p.category_id = cat.id "
+			+ "WHERE c.name like ?";
 	private PreparedStatement projectsByCity;
 
-	private static final String SELECT_FUNDS_BY_USER = "select p.title, fa.amount, fa.reward from user u "
-			+ "inner join funds f on u.id = f.user_id inner join funding_amount fa on f.fa_id = fa.id "
-			+ "inner join project p on fa.project_id = p.id where u.id = ?";
+	private static final String SELECT_FUNDS_BY_USER = "SELECT p.title, fa.amount, fa.reward "
+			+ "FROM user u INNER JOIN funds f ON u.id = f.user_id INNER JOIN funding_amount fa ON f.fa_id = fa.id "
+			+ "INNER JOIN project p ON fa.project_id = p.id "
+			+ "WHERE u.id = ?";
 	private PreparedStatement fundsByUser;
 
 	/**
