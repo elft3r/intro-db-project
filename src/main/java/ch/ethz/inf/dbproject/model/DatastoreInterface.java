@@ -573,7 +573,7 @@ public final class DatastoreInterface {
 				res.add(p);
 			}
 		} catch(SQLException e) {
-			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!");
+			logger.log(Level.WARNING, "Failed to retrieve the most popular projects!", e);
 		}
 		
 		return res;
