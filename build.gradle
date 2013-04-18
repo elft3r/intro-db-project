@@ -29,4 +29,4 @@ dependencies {
 }
 
 // Heroku needs the 'stage' task, as this is triggered at the server
-task stage(dependsOn: [test, installApp])
+task stage(dependsOn: [clean, test, installApp])

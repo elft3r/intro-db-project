@@ -29,3 +29,9 @@ INSERT INTO stretched_goal (goal, bonus, project_id) VALUES
 INSERT INTO funds (user_id, fa_id) VALUES
 (1, 1),
 (2, 2);
+
+INSERT INTO comment (text, user_id, project_id) VALUES
+("First comment", 1, 1),
+("Second comment", 2, 1),
+("Third comment", 1, 1),
+("Fourth comment", 2, 1);
