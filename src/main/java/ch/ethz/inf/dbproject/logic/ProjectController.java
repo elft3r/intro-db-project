@@ -21,10 +21,11 @@ import ch.ethz.inf.utils.FacesContextUtils;
 import ch.ethz.inf.utils.StringUtils;
 
 /**
- * This is a hack: Note that a persistent scope such as ViewScope/SessionScoped is required in order
- * to invoke the commandLink inside the datatable. The proper way would be to construct a
- * ProjectModel which contains all the domain objects. But since this is only a school project we
- * will stick to this solution...
+ * This is a hack: Note that a persistent scope such as ViewScope/SessionScoped
+ * is required in order to invoke the commandLink inside the datatable. The
+ * proper way would be to construct a ProjectModel which contains all the domain
+ * objects. But since this is only a school project we will stick to this
+ * solution...
  */
 @ManagedBean
 @ViewScoped
@@ -43,7 +44,7 @@ public class ProjectController implements Serializable {
 
 	private BigDecimal newFundingAmount;
 	private String newReward;
-	
+
 	private BigDecimal newGoal;
 	private String newBonus;
 
@@ -52,13 +53,14 @@ public class ProjectController implements Serializable {
 
 	@PostConstruct
 	public void init() {
-		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+		ExternalContext context = FacesContext.getCurrentInstance()
+				.getExternalContext();
 		String id = context.getRequestParameterMap().get("id");
 		if (StringUtils.isNotNullNorEmpty(id)) {
 			projectId = Integer.valueOf(id);
 		}
 
-		//TODO do we want to have this in one SQL query?
+		// TODO do we want to have this in one SQL query?
 		selectedProject = dbInterface.getProjectById(getProjectId());
 		fundingAmounts = dbInterface.getAmountsOfProject(projectId);
 		comments = dbInterface.getCommentsByProjectId(projectId);
@@ -74,11 +76,13 @@ public class ProjectController implements Serializable {
 	}
 
 	public String support() {
-		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+		ExternalContext context = FacesContext.getCurrentInstance()
+				.getExternalContext();
 		String id = context.getRequestParameterMap().get("fundingAmountId");
 		if (StringUtils.isNotNullNorEmpty(id)) {
 			int fundingAmountId = Integer.valueOf(id);
-			dbInterface.fundProject(sessionData.getUser().getId(), fundingAmountId);
+			dbInterface.fundProject(sessionData.getUser().getId(),
+					fundingAmountId);
 		}
 		return "User.jsf?faces-redirect=true";
 	}
@@ -98,10 +102,12 @@ public class ProjectController implements Serializable {
 
 			// try to create the new comment and if it fails show a message
 			if (dbInterface.createComment(comment) == null) {
-				throw new Exception("Failed to create a new comment. Please try it again!");
+				throw new Exception(
+						"Failed to create a new comment. Please try it again!");
 			}
-			
-			// make sure that when we created the comment successfully we reload the page
+
+			// make sure that when we created the comment successfully we reload
+			// the page
 			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
 		} catch (Exception e) {
 			FacesContextUtils.showMessage(e.getMessage());
@@ -116,12 +122,14 @@ public class ProjectController implements Serializable {
 			fa.setAmount(newFundingAmount);
 			fa.setProjectId(projectId);
 			fa.setReward(newReward);
-			
-			if(dbInterface.createFundingAmount(fa) == null) {
-				throw new Exception("Failed to create the new funding amount. Please try it again!");
+
+			if (dbInterface.createFundingAmount(fa) == null) {
+				throw new Exception(
+						"Failed to create the new funding amount. Please try it again!");
 			}
-			
-			// make sure that when we created the new funding amount successfully we reload the page
+
+			// make sure that when we created the new funding amount
+			// successfully we reload the page
 			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
 		} catch (Exception e) {
 			FacesContextUtils.showMessage(e.getMessage());
@@ -129,7 +137,7 @@ public class ProjectController implements Serializable {
 
 		return null;
 	}
-	
+
 	public String addStretchedGoal() {
 		try {
 			StretchedGoals sg = new StretchedGoals();
@@ -138,16 +146,23 @@ public class ProjectController implements Serializable {
 			sg.setProjectId(projectId);
 
 			if (dbInterface.createStretchedGoal(sg) == null) {
-				throw new Exception("Failed to create the new stretched goal. Please try again!");
+				throw new Exception(
+						"Failed to create the new stretched goal. Please try again!");
 			}
 
-			// make sure that when we created the new stretched goal successfully we reload the page
+			// make sure that when we created the new stretched goal
+			// successfully we reload the page
 			FacesContextUtils.redirect("Project.jsf?id=" + projectId);
 		} catch (Exception e) {
 			FacesContextUtils.showMessage(e.getMessage());
 		}
 
 		return null;
+	}
+
+	public String getFundingProgress() {
+		BigDecimal progress = dbInterface.getFundingProgressByProject(selectedProject.getId());
+		return "" + progress.multiply(new BigDecimal(100)).intValue();
 	}
 
 	public List<Comment> getComments() {
