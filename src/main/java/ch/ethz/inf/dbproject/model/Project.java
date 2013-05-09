@@ -7,6 +7,8 @@ import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import ch.ethz.inf.dbproject.database.DatastoreInterface;
+
 public final class Project implements Serializable {
 
 	private static final long serialVersionUID = 413320471268725530L;

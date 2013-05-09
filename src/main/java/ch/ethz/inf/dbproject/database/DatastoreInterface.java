@@ -1,4 +1,4 @@
-package ch.ethz.inf.dbproject.model;
+package ch.ethz.inf.dbproject.database;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -13,7 +13,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import ch.ethz.inf.dbproject.database.DatabaseConnection;
+import ch.ethz.inf.dbproject.model.Category;
+import ch.ethz.inf.dbproject.model.City;
+import ch.ethz.inf.dbproject.model.Comment;
+import ch.ethz.inf.dbproject.model.FundingAmount;
+import ch.ethz.inf.dbproject.model.Project;
+import ch.ethz.inf.dbproject.model.StretchedGoals;
+import ch.ethz.inf.dbproject.model.User;
 import ch.ethz.inf.utils.StringUtils;
 
 /**
