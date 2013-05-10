@@ -41,10 +41,11 @@ public class Tuple {
 		return Double.parseDouble(this.values[index]);
 	}
 
-	// TODO 
-	// You may add other custom type getters here
-	// i.e. Date, Time
 	
+	/**
+	 * This method generates a comma separated string of all values, which represent this tuple.
+	 * The returned String could be used to insert a new tuple into the database. 
+	 */
 	public final String toString() {
 		final StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < values.length; i++) {

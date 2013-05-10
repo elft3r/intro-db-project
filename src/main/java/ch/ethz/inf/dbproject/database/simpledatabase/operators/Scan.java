@@ -1,11 +1,12 @@
 package ch.ethz.inf.dbproject.database.simpledatabase.operators;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import ch.ethz.inf.dbproject.database.simpledatabase.Tuple;
 import ch.ethz.inf.dbproject.database.simpledatabase.TupleSchema;
 
 /**
@@ -14,8 +15,10 @@ import ch.ethz.inf.dbproject.database.simpledatabase.TupleSchema;
  */
 public class Scan extends Operator {
 
-	private final TupleSchema schema;
-	private final BufferedReader reader;
+	private static final Logger logger = Logger.getLogger(Scan.class.getName());
+
+	private TupleSchema schema;
+	private Scanner scanner;
 
 	/**
 	 * Contructs a new scan operator.
@@ -28,49 +31,31 @@ public class Scan extends Operator {
 		// create schema
 		this.schema = new TupleSchema(columnNames);
 
-		// read from file
-		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader(fileName));
+			scanner = new Scanner(new File(fileName));
 		} catch (final FileNotFoundException e) {
-			throw new RuntimeException("could not find file " + fileName);
+			logger.log(Level.WARNING, "could not find file " + fileName);
 		}
-		this.reader = reader;
-	}
-
-	/**
-	 * Constructs a new scan operator (mainly for testing purposes).
-	 * 
-	 * @param reader
-	 *            reader to read lines from
-	 * @param columns
-	 *            column names
-	 */
-	public Scan(final Reader reader, final String[] columnNames) {
-		this.reader = new BufferedReader(reader);
-		this.schema = new TupleSchema(columnNames);
 	}
 
 	@Override
 	public boolean moveNext() {
 
+		if (scanner == null) // in case that the file doesn't exist
+			return false;
+
 		try {
 
-			// TODO
-			// a) read next line
-			// b) check if we are at the end of the file (line would be null)
-			// b1. if we reached end of the file, close the buffered reader
-			// c) split up comma separated values
-			// d) create new tuple using schema and values
-			throw new IOException("NOT IMPLEMENTED");
-
-		} catch (final IOException e) {
-
-			throw new RuntimeException("could not read: " + this.reader
-					+ ". Error is " + e);
-
+			if (scanner.hasNextLine()) {
+				String nextLine = scanner.nextLine();
+				String[] values = nextLine.split(",");
+				current = new Tuple(schema, values);
+				return true;
+			}
+			scanner.close();
+		} catch (Exception e) {
+			logger.warning("failed to close scanner");
 		}
-
+		return false;
 	}
-
 }
