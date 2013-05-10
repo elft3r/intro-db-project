@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
 
 /**
  * Object that represents a user comment.
@@ -102,7 +103,7 @@ public class Comment implements Serializable {
 
 	private void initDbInterface() {
 		if (dbInterface == null) {
-			dbInterface = new DatastoreInterface();
+			dbInterface = new DatastoreInterfaceMySQL();
 		}
 	}
 }

@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
 
 public final class Project implements Serializable {
 
@@ -37,22 +36,6 @@ public final class Project implements Serializable {
 	
 	// TODO this is again ugly, but for now we keep it that way
 	private int userCount;
-
-	public Project() {
-
-	}
-
-	public Project(final ResultSet rs) throws SQLException {
-		this.categoryId = rs.getInt("category_id");
-		this.cityId = rs.getInt("city_id");
-		this.description = rs.getString("description");
-		this.endDate = rs.getDate("end_date");
-		this.goal = rs.getBigDecimal("goal");
-		this.id = rs.getInt("id");
-		this.ownerId = rs.getInt("owner_id");
-		this.startDate = rs.getDate("start_date");
-		this.title = rs.getString("title");
-	}
 
 	public String getTitle() {
 		return title;
@@ -170,7 +153,7 @@ public final class Project implements Serializable {
 	}
 
 	private void initDbInterface() {
-		dbInterface = new DatastoreInterface();
+		dbInterface = new DatastoreInterfaceMySQL();
 	}
 	
 	public String getRemainingFundingTime() {

@@ -46,34 +46,20 @@ public abstract class DatabaseConnection {
 		return getInstance(DBType.MySQL);
 	}
 
-	public static DatabaseConnection getHomebrewInstance() throws Exception {
-		return getInstance(DBType.HOMEBREW);
-	}
-
 	public static synchronized DatabaseConnection getInstance(DBType type) throws Exception {
-		// for now we use as Default the MySQL DB
-		// TODO change the default to the Homebrew DB as soon as we have it
-		if (type == null) {
-			type = DBType.MySQL;
-		}
 
 		if (instance == null) {
 			switch (type) {
 				case MySQL:
 					instance = new MySQLConnection();
 					break;
-				case HOMEBREW:
-					// TODO Implement this
-					// break;
 				default:
 					throw new Exception("The DBType was not properly set!");
 			}
 		} else {
 			if (DBType.MySQL.equals(type) && !(instance instanceof MySQLConnection)) {
 				throw new Exception("The available instance is not of type MySQLConnection.");
-			}
-
-			// TODO extend this check as soon as we have the homebrew version
+			} 
 		}
 
 		return instance;

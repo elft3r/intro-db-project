@@ -13,6 +13,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
 import ch.ethz.inf.dbproject.model.Comment;
 import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.Project;
@@ -33,7 +34,7 @@ public class ProjectController implements Serializable {
 
 	private static final long serialVersionUID = -6272753030255122907L;
 
-	private DatastoreInterface dbInterface = new DatastoreInterface();
+	private DatastoreInterface dbInterface = new DatastoreInterfaceMySQL();
 
 	private String newComment;
 	private List<Comment> comments;

@@ -7,6 +7,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
 import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.User;
 import ch.ethz.inf.utils.FacesContextUtils;
@@ -16,7 +17,7 @@ import ch.ethz.inf.utils.StringUtils;
 @RequestScoped
 public class UserController {
 
-	private final DatastoreInterface dbInterface = new DatastoreInterface();
+	private final DatastoreInterface dbInterface = new DatastoreInterfaceMySQL();
 
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;

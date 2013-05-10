@@ -11,6 +11,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
 import ch.ethz.inf.dbproject.model.Category;
 import ch.ethz.inf.dbproject.model.City;
 import ch.ethz.inf.dbproject.model.Project;
@@ -23,7 +24,7 @@ public class NewProjectController implements Serializable {
 
 	private static final long serialVersionUID = 3957968651102264563L;
 
-	private final DatastoreInterface dbInterface = new DatastoreInterface();
+	private final DatastoreInterface dbInterface = new DatastoreInterfaceMySQL();
 
 	@ManagedProperty(value = "#{sessionData}")
 	private SessionData sessionData;

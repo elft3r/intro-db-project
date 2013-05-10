@@ -7,13 +7,14 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
 import ch.ethz.inf.dbproject.model.Project;
 
 @ManagedBean
 @RequestScoped
 public class ProjectsController {
 	
-	private final DatastoreInterface dbInterface = new DatastoreInterface();
+	private final DatastoreInterface dbInterface = new DatastoreInterfaceMySQL();
 	
 	// The filter parameter defines what to show on the Projects page
 	@ManagedProperty(value="#{param.filter}")  // read from request parameter
