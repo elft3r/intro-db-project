@@ -44,45 +44,19 @@ public class Select<T> extends Operator {
 	}
 
 	private final boolean accept(final Tuple tuple) {
-
 		final int columnIndex = tuple.getSchema().getIndex(this.column);
-
-		if (tuple.get(columnIndex).equals(this.compareValue.toString())) {
-			return true;
-		} else {
-			return false;
-		}
-
+		return tuple.get(columnIndex).equals(this.compareValue.toString());
 	}
 
 	@Override
 	public boolean moveNext() {
-
-		// TODO the contents of this method are just to give you an idea of
-		// how it should look like.
-
-		// a) retrieve the next tuple from the child operator
-		if (!this.op.moveNext()) {
-			return false;
+		while(op.moveNext()){ // loop until we either find a match or op has no more tuples
+			Tuple candidate = op.current(); 
+			if(accept(candidate)){ // check if our predicate accepts this candidate
+				current = candidate;
+				return true;
+			}
 		}
-
-		// b) if there is a next tuple, pull it
-		final Tuple t = this.op.current();
-
-		// c) check if this tuple matches our selection predicate
-		if (this.accept(t)) {
-
-			// It does
-			this.current = t;
-			return true;
-
-		} else {
-			// TODO: loop until we either find something that matches,
-			// or this.op has no more tuples.
-
-			// HINT: try to avoid recursive calls here.
-		}
-
 		return false;
 	}
 

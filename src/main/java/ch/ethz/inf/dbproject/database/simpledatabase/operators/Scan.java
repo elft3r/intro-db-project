@@ -23,11 +23,13 @@ public class Scan extends Operator {
 	/**
 	 * Contructs a new scan operator.
 	 * 
-	 * @param fileName
+	 * @param tableName
 	 *            file to read tuples from
 	 */
-	public Scan(final String fileName, final String[] columnNames) {
+	public Scan(final String tableName, String[] columnNames) {
 
+		String fileName = "localdb" + File.pathSeparator + tableName + ".txt";
+		
 		// create schema
 		this.schema = new TupleSchema(columnNames);
 

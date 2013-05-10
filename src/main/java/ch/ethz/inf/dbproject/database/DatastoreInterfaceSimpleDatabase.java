@@ -17,6 +17,9 @@ import ch.ethz.inf.dbproject.model.User;
 
 
 public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterface {
+	
+	private static final String USER_TABLE = "user";
+	private static final String[] USER_COLUMNS = {"id", "username", "password"};
 
 	@Override
 	public final Project getProjectById(final int id) {
@@ -97,7 +100,17 @@ public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterfac
 
 	@Override
 	public User getUserBy(String name) {
-		// TODO Auto-generated method stub
+		
+		Scan scan = new Scan(USER_TABLE, USER_COLUMNS);
+		Select<String> select = new Select<String>(scan, "username", name);
+		if(select.moveNext()){
+			Tuple current = select.current();
+			User user = new User();
+			user.setId(current.getInt(0));
+			user.setUsername(current.get(1));
+			user.setPassword(current.get(2));
+			return user;
+		}
 		return null;
 	}
 
