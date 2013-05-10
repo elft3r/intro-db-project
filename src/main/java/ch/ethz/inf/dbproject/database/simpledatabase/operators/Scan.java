@@ -8,7 +8,6 @@ import java.io.Reader;
 
 import ch.ethz.inf.dbproject.database.simpledatabase.TupleSchema;
 
-
 /**
  * The scan operator reads tuples from a file. The lines in the file contain the
  * values of a tuple. The line a comma separated.
@@ -20,13 +19,12 @@ public class Scan extends Operator {
 
 	/**
 	 * Contructs a new scan operator.
-	 * @param fileName file to read tuples from
+	 * 
+	 * @param fileName
+	 *            file to read tuples from
 	 */
-	public Scan(
-		final String fileName, 
-		final String[] columnNames
-	) {
-		
+	public Scan(final String fileName, final String[] columnNames) {
+
 		// create schema
 		this.schema = new TupleSchema(columnNames);
 
@@ -42,37 +40,37 @@ public class Scan extends Operator {
 
 	/**
 	 * Constructs a new scan operator (mainly for testing purposes).
-	 * @param reader reader to read lines from
-	 * @param columns column names
+	 * 
+	 * @param reader
+	 *            reader to read lines from
+	 * @param columns
+	 *            column names
 	 */
-	public Scan(
-		final Reader reader, 
-		final String[] columnNames
-	) {
+	public Scan(final Reader reader, final String[] columnNames) {
 		this.reader = new BufferedReader(reader);
 		this.schema = new TupleSchema(columnNames);
 	}
 
 	@Override
 	public boolean moveNext() {
-		
+
 		try {
-			
+
 			// TODO
 			// a) read next line
 			// b) check if we are at the end of the file (line would be null)
-			//   b1. if we reached end of the file, close the buffered reader
+			// b1. if we reached end of the file, close the buffered reader
 			// c) split up comma separated values
 			// d) create new tuple using schema and values
 			throw new IOException("NOT IMPLEMENTED");
-			
+
 		} catch (final IOException e) {
-			
-			throw new RuntimeException("could not read: " + this.reader + 
-				". Error is " + e);
-			
+
+			throw new RuntimeException("could not read: " + this.reader
+					+ ". Error is " + e);
+
 		}
-		
+
 	}
 
 }

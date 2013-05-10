@@ -17,6 +17,7 @@ public abstract class Operator {
 	/**
 	 * Moves forward to the next tuple. The next tuple can be retrieved by a
 	 * call to current(). If there is no more tuple, this method returns false.
+	 * 
 	 * @return true, if we advanced to next tuple
 	 */
 	public abstract boolean moveNext();
@@ -27,5 +28,5 @@ public abstract class Operator {
 	public final Tuple current() {
 		return this.current;
 	}
-	
+
 }

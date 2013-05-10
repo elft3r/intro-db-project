@@ -7,9 +7,8 @@ import java.util.Comparator;
 import ch.ethz.inf.dbproject.database.simpledatabase.Tuple;
 
 /**
- * An empty sort operator
- * For the purposes of the project, you can consider only string comparisons of
- * the values.
+ * An empty sort operator For the purposes of the project, you can consider only
+ * string comparisons of the values.
  */
 public class Sort extends Operator implements Comparator<Tuple> {
 
@@ -17,29 +16,22 @@ public class Sort extends Operator implements Comparator<Tuple> {
 	private final String column;
 	private final boolean ascending;
 	private final ArrayList<Tuple> sortBuffer;
-	
-	public Sort(
-		final Operator op,
-		final String column,
-		final boolean ascending
-	) {
+
+	public Sort(final Operator op, final String column, final boolean ascending) {
 		this.op = op;
 		this.column = column;
 		this.ascending = ascending;
 		this.sortBuffer = new ArrayList<Tuple>();
 	}
-	
+
 	@Override
-	public final int compare(
-		final Tuple l, 
-		final Tuple r
-	) {
-		
+	public final int compare(final Tuple l, final Tuple r) {
+
 		final int columnIndex = l.getSchema().getIndex(this.column);
-		
-		final int result = 
-			l.get(columnIndex).compareToIgnoreCase(r.get(columnIndex));
-		
+
+		final int result = l.get(columnIndex).compareToIgnoreCase(
+				r.get(columnIndex));
+
 		if (this.ascending) {
 			return result;
 		} else {
@@ -50,19 +42,18 @@ public class Sort extends Operator implements Comparator<Tuple> {
 	@Override
 	public boolean moveNext() {
 
-		// TODO 
-		
+		// TODO
+
 		// a) if this is the first call:
-		//   1) fetch _all_ tuples from this.op and store them in sort buffer
-		//   2) sort the buffer
+		// 1) fetch _all_ tuples from this.op and store them in sort buffer
+		// 2) sort the buffer
 		Collections.sort(this.sortBuffer, this);
-		//   3) set the current tuple to the first one in the sort buffer and 
-		//      remember you are at offset 0
-		// b) if this is not the first call 
-		//   1) increase the offset and if it is valid fetch the next tuple
-		
+		// 3) set the current tuple to the first one in the sort buffer and
+		// remember you are at offset 0
+		// b) if this is not the first call
+		// 1) increase the offset and if it is valid fetch the next tuple
+
 		return false;
 	}
 
-	
 }

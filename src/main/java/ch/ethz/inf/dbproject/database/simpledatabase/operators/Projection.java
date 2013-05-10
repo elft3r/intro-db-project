@@ -6,7 +6,7 @@ import ch.ethz.inf.dbproject.database.simpledatabase.TupleSchema;
  * Projection in relational algebra. Returns tuples that contain on projected
  * columns. Therefore the new tuples conform to a new schema.
  */
-public final class Project extends Operator {
+public final class Projection extends Operator {
 
 	private final Operator op;
 	private final String[] columns;
@@ -14,25 +14,25 @@ public final class Project extends Operator {
 
 	/**
 	 * Constructs a new projection operator.
-	 * @param op operator to pull from
-	 * @param column single column name that will be projected
+	 * 
+	 * @param op
+	 *            operator to pull from
+	 * @param column
+	 *            single column name that will be projected
 	 */
-	public Project(
-		final Operator op, 
-		final String column
-	) {
+	public Projection(final Operator op, final String column) {
 		this(op, new String[] { column });
 	}
 
 	/**
 	 * Constructs a new projection operator.
-	 * @param op operator to pull from
-	 * @param columns column names that will be projected
+	 * 
+	 * @param op
+	 *            operator to pull from
+	 * @param columns
+	 *            column names that will be projected
 	 */
-	public Project(
-		final Operator op, 
-		final String[] columns
-	) {
+	public Projection(final Operator op, final String[] columns) {
 		this.op = op;
 		this.columns = columns;
 		this.newSchema = new TupleSchema(columns);

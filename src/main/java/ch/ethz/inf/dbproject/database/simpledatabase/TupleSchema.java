@@ -16,9 +16,7 @@ public class TupleSchema {
 	 * Constructs a new tuple schema.
 	 * @param columnNames column names
 	 */
-	public TupleSchema(
-		final String[] columnNames
-	) {
+	public TupleSchema(final String[] columnNames) {
 		this.columnNames = columnNames;
 		
 		this.columnNamesMap = new HashMap<String, Integer>();
