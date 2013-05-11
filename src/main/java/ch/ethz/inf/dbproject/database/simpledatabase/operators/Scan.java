@@ -1,10 +1,14 @@
 package ch.ethz.inf.dbproject.database.simpledatabase.operators;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.faces.context.FacesContext;
 
 import ch.ethz.inf.dbproject.database.simpledatabase.Tuple;
 import ch.ethz.inf.dbproject.database.simpledatabase.TupleSchema;
@@ -28,15 +32,17 @@ public class Scan extends Operator {
 	 */
 	public Scan(final String tableName, String[] columnNames) {
 
-		String fileName = "localdb" + File.pathSeparator + tableName + ".txt";
-		
+		String filePath = "localdb" + File.separator + tableName + ".txt";
+
 		// create schema
 		this.schema = new TupleSchema(columnNames);
 
 		try {
-			scanner = new Scanner(new File(fileName));
-		} catch (final FileNotFoundException e) {
-			logger.log(Level.WARNING, "could not find file " + fileName);
+			InputStream inputStream = FacesContext.getCurrentInstance()
+					.getExternalContext().getResourceAsStream(filePath);
+			scanner = new Scanner(inputStream);
+		} catch (Exception e) {
+			logger.log(Level.WARNING, "exception while reading file " + filePath);
 		}
 	}
 
