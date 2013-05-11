@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
-import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceSimpleDatabase;
 
 public final class Project implements Serializable {
 
@@ -153,7 +153,7 @@ public final class Project implements Serializable {
 	}
 
 	private void initDbInterface() {
-		dbInterface = new DatastoreInterfaceMySQL();
+		dbInterface = new DatastoreInterfaceSimpleDatabase();
 	}
 	
 	public String getRemainingFundingTime() {

@@ -9,7 +9,9 @@ import java.util.List;
 
 import ch.ethz.inf.dbproject.database.simpledatabase.Tuple;
 import ch.ethz.inf.dbproject.database.simpledatabase.operators.Container;
+import ch.ethz.inf.dbproject.database.simpledatabase.operators.HashJoin;
 import ch.ethz.inf.dbproject.database.simpledatabase.operators.Insert;
+import ch.ethz.inf.dbproject.database.simpledatabase.operators.Like;
 import ch.ethz.inf.dbproject.database.simpledatabase.operators.Scan;
 import ch.ethz.inf.dbproject.database.simpledatabase.operators.Select;
 import ch.ethz.inf.dbproject.model.Category;
@@ -31,6 +33,17 @@ public final class DatastoreInterfaceSimpleDatabase implements
 
 	private static final String USER_TABLE = "user";
 	private static final String[] USER_COLUMNS = { "id", "username", "password" };
+
+	private static final String PROJECT_TABLE = "project";
+	private static final String[] PROJECT_COLUMNS = { "id", "title",
+			"description", "goal", "start_date", "end_date", "city_id",
+			"category_id", "owner_id" };
+
+	private static final String CITY_TABLE = "city";
+	private static final String[] CITY_COLUMNS = { "id", "name" };
+
+	private static final String CATEGORY_TABLE = "category";
+	private static final String[] CATEGORY_COLUMNS = { "id", "name" };
 
 	@Override
 	public final Project getProjectById(final int id) {
@@ -75,8 +88,33 @@ public final class DatastoreInterfaceSimpleDatabase implements
 
 	@Override
 	public List<Project> getProjectsByName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		Scan projectScan = new Scan(PROJECT_TABLE, PROJECT_COLUMNS, "p");
+		Scan cityScan = new Scan(CITY_TABLE, CITY_COLUMNS, "c");
+		Scan categoryScan = new Scan(CATEGORY_TABLE, CATEGORY_COLUMNS, "cat");
+
+		// optimization: push down selection
+		Like projectSelect = new Like(projectScan, "p.title", name);
+
+		HashJoin projectCityJoin = new HashJoin(cityScan, projectSelect, "c.id", "p.city_id");
+		HashJoin projectCityCategoryJoin = new HashJoin(categoryScan, projectCityJoin, "cat.id", "p.category_id");
+
+		List<Project> projects = new ArrayList<>();
+		while (projectCityCategoryJoin.moveNext()) {
+			Tuple tuple = projectCityCategoryJoin.current();
+
+			Project project = new Project();
+			project.setId(tuple.getInt("p.id"));
+			project.setTitle(tuple.get("p.title"));
+			project.setDescription(tuple.get("p.description"));
+			project.setGoal(tuple.getBigDecimal("p.goal"));
+			project.setStartDate(tuple.getDate("p.start_date"));
+			project.setEndDate(tuple.getDate("p.end_date"));
+			project.setCityId(tuple.getInt("p.city_id"));
+			project.setCategoryId(tuple.getInt("p.category_id"));
+			project.setOwnerId(tuple.getInt("p.owner_id"));
+			projects.add(project);
+		}
+		return projects;
 	}
 
 	@Override
@@ -169,8 +207,14 @@ public final class DatastoreInterfaceSimpleDatabase implements
 
 	@Override
 	public Category getCategoryById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Scan scan = new Scan(CATEGORY_TABLE, CATEGORY_COLUMNS);
+		Select<String> select = new Select<String>(scan, "id", String.valueOf(id));
+		Category category = null;
+		while(select.moveNext()){ // use while in order to close resources!
+			Tuple tuple = select.current();
+			category = new Category(tuple.get("name"));
+		}
+		return category;
 	}
 
 	@Override
@@ -181,8 +225,14 @@ public final class DatastoreInterfaceSimpleDatabase implements
 
 	@Override
 	public City getCityById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Scan scan = new Scan(CITY_TABLE, CITY_COLUMNS);
+		Select<String> select = new Select<String>(scan, "id", String.valueOf(id));
+		City city = null;
+		while(select.moveNext()){ // use while in order to close resources!
+			Tuple tuple = select.current();
+			city = new City(tuple.get("name"));
+		}
+		return city;
 	}
 
 	@Override

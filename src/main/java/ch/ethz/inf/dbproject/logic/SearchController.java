@@ -8,13 +8,14 @@ import javax.faces.bean.RequestScoped;
 
 import ch.ethz.inf.dbproject.database.DatastoreInterface;
 import ch.ethz.inf.dbproject.database.DatastoreInterfaceMySQL;
+import ch.ethz.inf.dbproject.database.DatastoreInterfaceSimpleDatabase;
 import ch.ethz.inf.dbproject.model.Project;
 
 @ManagedBean
 @RequestScoped
 public class SearchController {
 
-	private DatastoreInterface dbInterface = new DatastoreInterfaceMySQL();
+	private DatastoreInterface dbInterface = new DatastoreInterfaceSimpleDatabase();
 
 	private String name;
 	private String category;
