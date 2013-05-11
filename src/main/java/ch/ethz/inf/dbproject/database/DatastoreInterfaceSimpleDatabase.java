@@ -1,10 +1,15 @@
 package ch.ethz.inf.dbproject.database;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.ethz.inf.dbproject.database.simpledatabase.Tuple;
+import ch.ethz.inf.dbproject.database.simpledatabase.operators.Container;
+import ch.ethz.inf.dbproject.database.simpledatabase.operators.Insert;
 import ch.ethz.inf.dbproject.database.simpledatabase.operators.Scan;
 import ch.ethz.inf.dbproject.database.simpledatabase.operators.Select;
 import ch.ethz.inf.dbproject.model.Category;
@@ -14,28 +19,28 @@ import ch.ethz.inf.dbproject.model.FundingAmount;
 import ch.ethz.inf.dbproject.model.Project;
 import ch.ethz.inf.dbproject.model.StretchedGoals;
 import ch.ethz.inf.dbproject.model.User;
+import ch.ethz.inf.utils.FacesContextUtils;
 
+import com.sun.istack.internal.logging.Logger;
 
-public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterface {
-	
+public final class DatastoreInterfaceSimpleDatabase implements
+		DatastoreInterface {
+
+	private static final Logger logger = Logger
+			.getLogger(DatastoreInterfaceSimpleDatabase.class);
+
 	private static final String USER_TABLE = "user";
-	private static final String[] USER_COLUMNS = {"id", "username", "password"};
+	private static final String[] USER_COLUMNS = { "id", "username", "password" };
 
 	@Override
 	public final Project getProjectById(final int id) {
-	
+
 		/**
 		 * TODO this method should return the product with the given id
 		 */
-		final Scan scan = new Scan("projects.txt", 
-			new String[] {
-				"id",
-				"name",
-				"field2",
-				"field3"
-			}
-		);
-		
+		final Scan scan = new Scan("projects.txt", new String[] { "id", "name",
+				"field2", "field3" });
+
 		final Select<Integer> select = new Select<Integer>(scan, "id", id);
 		if (select.moveNext()) {
 			Tuple tuple = select.current();
@@ -46,7 +51,7 @@ public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterfac
 		}
 		return null;
 	}
-	
+
 	@Override
 	public final List<Category> getAllCategories() {
 
@@ -100,10 +105,10 @@ public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterfac
 
 	@Override
 	public User getUserBy(String name) {
-		
+
 		Scan scan = new Scan(USER_TABLE, USER_COLUMNS);
 		Select<String> select = new Select<String>(scan, "username", name);
-		if(select.moveNext()){
+		if (select.moveNext()) {
 			Tuple current = select.current();
 			User user = new User();
 			user.setId(current.getInt(0));
@@ -116,7 +121,13 @@ public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterfac
 
 	@Override
 	public User createUser(String username, String password) {
-		// TODO Auto-generated method stub
+		String id = getNextId(USER_TABLE);
+		Tuple tuple = new Tuple(null, id, username, password);
+		Insert insert = new Insert(new Container(tuple), USER_TABLE);
+
+		if (insert.moveNextAndClose()) { // successful insert
+			return new User(Integer.parseInt(id), username, password);
+		}
 		return null;
 	}
 
@@ -129,7 +140,7 @@ public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterfac
 	@Override
 	public void fundProject(int userId, int fundingAmountId) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -227,4 +238,28 @@ public final class DatastoreInterfaceSimpleDatabase implements DatastoreInterfac
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/**
+	 * Gets the next id for the specified table or 1 if the table doesn't exist
+	 * yet! Note: The next id for a table is simply: #amountOfTuples + 1
+	 */
+	private String getNextId(String tableName) {
+		try {
+			InputStream inStream = FacesContextUtils
+					.getInputStreamToDb(tableName);
+			if (inStream != null) {
+				LineNumberReader inReader = new LineNumberReader(
+						new InputStreamReader(inStream));
+				while (inReader.skip(Long.MAX_VALUE) > 0)
+					;
+				inReader.close();
+				return "" + (inReader.getLineNumber() + 1);
+			}
+		} catch (Exception e) {
+			logger.warning("Failed to autoincrement " + tableName);
+		}
+
+		return "1";
+	}
+
 }
