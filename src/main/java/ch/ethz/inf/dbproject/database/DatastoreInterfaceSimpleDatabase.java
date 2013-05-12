@@ -98,9 +98,13 @@ public final class DatastoreInterfaceSimpleDatabase implements
 		HashJoin projectCityJoin = new HashJoin(cityScan, projectSelect, "c.id", "p.city_id");
 		HashJoin projectCityCategoryJoin = new HashJoin(categoryScan, projectCityJoin, "cat.id", "p.category_id");
 
+		return retrieveProjects(projectCityCategoryJoin);
+	}
+
+	private List<Project> retrieveProjects(HashJoin joinOperation) {
 		List<Project> projects = new ArrayList<>();
-		while (projectCityCategoryJoin.moveNext()) {
-			Tuple tuple = projectCityCategoryJoin.current();
+		while (joinOperation.moveNext()) {
+			Tuple tuple = joinOperation.current();
 
 			Project project = new Project();
 			project.setId(tuple.getInt("p.id"));
@@ -125,14 +129,32 @@ public final class DatastoreInterfaceSimpleDatabase implements
 
 	@Override
 	public List<Project> getProjectsByCategory(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		Scan projectScan = new Scan(PROJECT_TABLE, PROJECT_COLUMNS, "p");
+		Scan cityScan = new Scan(CITY_TABLE, CITY_COLUMNS, "c");
+		Scan categoryScan = new Scan(CATEGORY_TABLE, CATEGORY_COLUMNS, "cat");
+
+		// optimization: push down selection
+		Like categorySelect = new Like(categoryScan, "cat.name", name);
+
+		HashJoin categoryProjectJoin = new HashJoin(categorySelect, projectScan, "cat.id", "p.category_id");
+		HashJoin cityCategoryProjectJoin = new HashJoin(cityScan, categoryProjectJoin, "c.id", "p.city_id");
+
+		return retrieveProjects(cityCategoryProjectJoin);
 	}
 
 	@Override
 	public List<Project> getProjectsByCity(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		Scan projectScan = new Scan(PROJECT_TABLE, PROJECT_COLUMNS, "p");
+		Scan cityScan = new Scan(CITY_TABLE, CITY_COLUMNS, "c");
+		Scan categoryScan = new Scan(CATEGORY_TABLE, CATEGORY_COLUMNS, "cat");
+
+		// optimization: push down selection
+		Like citySelect = new Like(cityScan, "c.name", name);
+
+		HashJoin cityProjectJoin = new HashJoin(citySelect, projectScan, "c.id", "p.city_id");
+		HashJoin categoryCityProjectJoin = new HashJoin(categoryScan, cityProjectJoin, "cat.id", "p.category_id");
+
+		return retrieveProjects(categoryCityProjectJoin);
 	}
 
 	@Override
