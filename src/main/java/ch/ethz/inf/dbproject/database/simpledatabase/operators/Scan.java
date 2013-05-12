@@ -72,6 +72,7 @@ public class Scan extends Operator {
 				}
 			}
 			scanner.close();
+			scanner = null; // in order to stop next iteration, otherwise an IllegalStateException is thrown when scanner is closed and scanner.hasNextLine() is invoked!
 		} catch (Exception e) {
 			logger.warning("failed to close scanner");
 		}
